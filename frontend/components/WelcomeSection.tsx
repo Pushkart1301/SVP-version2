@@ -72,14 +72,15 @@ export function WelcomeSection({ user, stats, monthlyStats, onEditProfile }: Wel
                 {/* Attendance Progress Bars */}
                 <div className="flex-1 flex flex-col justify-center gap-4 lg:w-2/3">
                     {/* Monthly Progress Tracking */}
-                    <div className="bg-gray-50/50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-100 dark:border-gray-700/50 relative overflow-hidden group hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
-                        <div className="flex items-start justify-between mb-3">
+                    <div className="bg-gray-50/50 dark:bg-gray-800/50 rounded-xl p-3 border border-gray-100 dark:border-gray-700/50 relative overflow-hidden group hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
+                        <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
-                                <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400">
-                                    <Calendar className="w-5 h-5" />
+                                <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400">
+                                    <Calendar className="w-4 h-4" />
                                 </div>
-                                <div>
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
                                     <h4 className="text-sm font-bold text-gray-900 dark:text-white">Monthly Progress Tracking</h4>
+                                    <span className="hidden sm:block text-gray-300 dark:text-gray-600">•</span>
                                     <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
                                         {monthlyStats?.month_label ? `Progress for ${monthlyStats.month_label}` : "Shows month-by-month performance"}
                                     </p>
@@ -87,51 +88,42 @@ export function WelcomeSection({ user, stats, monthlyStats, onEditProfile }: Wel
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <span className={`text-base font-bold ${monthlyAttendance >= targetAttendance ? "text-green-600 dark:text-green-400" : "text-amber-600 dark:text-amber-500"}`}>
-                                    {monthlyAttendance}% <span className="text-xs font-medium text-gray-500 dark:text-gray-400">/ 100%</span>
-                                </span>
-                            </div>
+                        <div className="flex items-center gap-3">
                             <Progress
                                 value={monthlyAttendance}
-                                className="h-2"
+                                className="h-1.5 flex-1"
                                 indicatorClassName={monthlyAttendance >= targetAttendance ? "bg-green-500" : "bg-amber-500"}
                             />
-                            <p className="text-xs text-gray-500 dark:text-gray-400 pt-1">
-                                Helps track short-term attendance goals.
-                            </p>
+                            <span className={`text-sm font-bold shrink-0 ${monthlyAttendance >= targetAttendance ? "text-green-600 dark:text-green-400" : "text-amber-600 dark:text-amber-500"}`}>
+                                {monthlyAttendance}% <span className="text-xs font-medium text-gray-500 dark:text-gray-400 hidden sm:inline">/ 100%</span>
+                            </span>
                         </div>
                     </div>
 
                     {/* Overall Attendance */}
-                    <div className="bg-gray-50/50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-100 dark:border-gray-700/50 relative overflow-hidden group hover:border-indigo-200 dark:hover:border-indigo-800 transition-colors">
-                        <div className="flex items-start justify-between mb-3">
+                    <div className="bg-gray-50/50 dark:bg-gray-800/50 rounded-xl p-3 border border-gray-100 dark:border-gray-700/50 relative overflow-hidden group hover:border-indigo-200 dark:hover:border-indigo-800 transition-colors">
+                        <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
-                                <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400">
-                                    <TrendingUp className="w-5 h-5" />
+                                <div className="p-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400">
+                                    <TrendingUp className="w-4 h-4" />
                                 </div>
-                                <div>
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
                                     <h4 className="text-sm font-bold text-gray-900 dark:text-white">Overall Attendance</h4>
+                                    <span className="hidden sm:block text-gray-300 dark:text-gray-600">•</span>
                                     <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">Shows cumulative performance</p>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <span className={`text-base font-bold ${overallAttendance >= targetAttendance ? "text-green-600 dark:text-green-400" : "text-amber-600 dark:text-amber-500"}`}>
-                                    {overallAttendance}% <span className="text-xs font-medium text-gray-500 dark:text-gray-400">/ 100%</span>
-                                </span>
-                            </div>
+                        <div className="flex items-center gap-3">
                             <Progress
                                 value={overallAttendance}
-                                className="h-2"
+                                className="h-1.5 flex-1"
                                 indicatorClassName={overallAttendance >= targetAttendance ? "bg-green-500 dark:bg-green-400" : "bg-amber-500 dark:bg-amber-500"}
                             />
-                            <p className="text-xs text-gray-500 dark:text-gray-400 pt-1">
-                                Helps track long-term attendance performance.
-                            </p>
+                            <span className={`text-sm font-bold shrink-0 ${overallAttendance >= targetAttendance ? "text-green-600 dark:text-green-400" : "text-amber-600 dark:text-amber-500"}`}>
+                                {overallAttendance}% <span className="text-xs font-medium text-gray-500 dark:text-gray-400 hidden sm:inline">/ 100%</span>
+                            </span>
                         </div>
                     </div>
                 </div>
