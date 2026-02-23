@@ -2,7 +2,6 @@ from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from bson import ObjectId
 from app.models.user import UserResponse
-from app.routers.attendance import get_overall_attendance_stats, get_attendance_stats # Note: We might need to refactor these out if there's a circular import issue, but for now we'll import them or redefine the stats calculation.
 
 class NotificationService:
     @staticmethod
