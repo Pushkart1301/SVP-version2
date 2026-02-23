@@ -108,3 +108,20 @@ body {
     transform: scale(1) translateY(0);
   }
 }
+
+/* Slide in from top dropdown */
+@keyframes slideInFromTop {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-in {
+  animation: fadeIn 0.2s ease-in-out, slideInFromTop 0.2s ease-in-out;
+}

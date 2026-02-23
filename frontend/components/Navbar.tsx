@@ -109,16 +109,20 @@ export default function Navbar() {
                     <div className="relative">
                         <button
                             onClick={() => setIsProfileOpen(!isProfileOpen)}
-                            className="flex items-center gap-2 p-1.5 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                            className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 group"
+                            aria-label="User menu"
                         >
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm overflow-hidden ring-2 ring-white dark:ring-gray-900">
+                            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm overflow-hidden border-2 border-gray-200 dark:border-gray-700 shrink-0">
                                 {user?.profile_image ? (
                                     <img src={user.profile_image} alt="Profile" className="w-full h-full object-cover" />
                                 ) : (
                                     <span>{getInitials(userName)}</span>
                                 )}
                             </div>
-                            {isProfileOpen ? <ChevronUp size={16} className="text-gray-500 mr-1" /> : <ChevronDown size={16} className="text-gray-500 mr-1" />}
+                            <ChevronDown
+                                className={`h-4 w-4 text-gray-500 dark:text-gray-400 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''
+                                    }`}
+                            />
                         </button>
 
                         {/* Dropdown Menu */}
@@ -130,36 +134,33 @@ export default function Navbar() {
                                     onClick={() => setIsProfileOpen(false)}
                                 ></div>
 
-                                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 z-50 overflow-hidden py-2" style={{
-                                    animation: 'fadeIn 0.2s ease-out'
-                                }}>
+                                <div className="absolute right-0 top-full mt-2 w-64 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
                                     {/* User Info Header */}
-                                    <div className="px-4 py-3 bg-gray-50/50 dark:bg-gray-800/50 flex items-center gap-3">
-                                        <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-lg overflow-hidden shrink-0 border border-gray-200 dark:border-gray-700">
+                                    <div className="flex items-center gap-3 px-4 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                                        <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-lg overflow-hidden shrink-0 border-2 border-gray-200 dark:border-gray-700">
                                             {user?.profile_image ? (
                                                 <img src={user.profile_image} alt="Profile" className="w-full h-full object-cover" />
                                             ) : (
                                                 <span>{getInitials(userName)}</span>
                                             )}
                                         </div>
-                                        <div className="overflow-hidden">
-                                            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{userName}</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{userEmail}</p>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-semibold text-gray-900 dark:text-white truncate">{userName}</p>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{userEmail}</p>
                                         </div>
                                     </div>
 
-                                    <div className="h-px bg-gray-100 dark:bg-gray-800 my-1"></div>
-
-                                    <div className="px-2 py-1 space-y-1">
+                                    {/* Menu Items */}
+                                    <div className="py-2">
                                         {/* Edit Profile */}
                                         <button
                                             onClick={() => {
                                                 setIsProfileOpen(false);
                                                 setIsEditingProfile(true);
                                             }}
-                                            className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                                            className="flex w-full items-center gap-3 px-4 py-3 text-gray-900 dark:text-white transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
                                         >
-                                            <User size={18} className="text-gray-500 dark:text-gray-400" />
+                                            <User size={20} className="shrink-0" />
                                             <span className="font-medium">Edit Profile</span>
                                         </button>
 
@@ -169,29 +170,34 @@ export default function Navbar() {
                                                 e.stopPropagation();
                                                 toggleTheme();
                                             }}
-                                            className="w-full flex items-center justify-between px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                                            className="flex w-full items-center justify-between gap-3 px-4 py-3 text-gray-900 dark:text-white transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
                                         >
                                             <div className="flex items-center gap-3">
-                                                {theme === 'dark' ? <Moon size={18} className="text-gray-500 dark:text-gray-400" /> : <Sun size={18} className="text-gray-500 dark:text-gray-400" />}
+                                                {theme === 'dark' ? <Moon size={20} className="shrink-0" /> : <Sun size={20} className="shrink-0" />}
                                                 <span className="font-medium">Dark Mode</span>
                                             </div>
                                             {/* Toggle switch visual */}
-                                            <div className={`w-9 h-5 rounded-full flex items-center px-0.5 transition-colors ${theme === 'dark' ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`}>
-                                                <div className={`w-4 h-4 rounded-full bg-white shadow transform transition-transform ${theme === 'dark' ? 'translate-x-4' : 'translate-x-0'}`}></div>
+                                            <div
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${theme === 'dark' ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                                                    }`}
+                                            >
+                                                <span
+                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${theme === 'dark' ? 'translate-x-6' : 'translate-x-1'
+                                                        }`}
+                                                />
                                             </div>
                                         </button>
-                                    </div>
 
-                                    <div className="h-px bg-gray-100 dark:bg-gray-800 my-1"></div>
+                                        {/* Divider */}
+                                        <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
 
-                                    <div className="px-2 py-1">
                                         {/* Logout Button */}
                                         <button
                                             onClick={handleLogout}
-                                            className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors font-medium"
+                                            className="flex w-full items-center gap-3 px-4 py-3 text-red-600 dark:text-red-400 transition-colors hover:bg-red-50 dark:hover:bg-red-950/50"
                                         >
-                                            <LogOut size={18} />
-                                            <span>Logout</span>
+                                            <LogOut size={20} className="shrink-0" />
+                                            <span className="font-medium">Logout</span>
                                         </button>
                                     </div>
                                 </div>
