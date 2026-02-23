@@ -9,6 +9,7 @@ class UserBase(BaseModel):
     branch: Optional[str] = None
     semester: Optional[str] = None
     profile_image: Optional[str] = None
+    last_attendance_status: Optional[str] = None
 
 class UserCreate(UserBase):
     password: str

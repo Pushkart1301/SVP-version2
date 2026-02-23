@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from app.core.config import settings
 from app.core import database
 from app.core.logging_config import setup_logging
-from app.routers import auth, attendance, planner, subjects
+from app.routers import auth, attendance, planner, subjects, notification
 import logging
 
 # Initialize logging
@@ -50,6 +50,7 @@ app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["Aut
 app.include_router(attendance.router, prefix=f"{settings.API_V1_STR}/attendance", tags=["Attendance"])
 app.include_router(planner.router, prefix=f"{settings.API_V1_STR}/planner", tags=["Planner"])
 app.include_router(subjects.router, prefix=f"{settings.API_V1_STR}/subjects", tags=["Subjects"])
+app.include_router(notification.router, prefix=f"{settings.API_V1_STR}/notifications", tags=["Notifications"])
 
 @app.get("/")
 def root():
