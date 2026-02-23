@@ -24,11 +24,28 @@ async def get_notifications(
     db: AsyncIOMotorDatabase = Depends(database.get_database)
 ):
     """Get all notifications for the current user, sorted by most recent."""
-    cursor = db["notifications"].find({"user_id": current_user.id})
-    cursor.sort("created_at", -1).skip(skip).limit(limit)
+    # Fetch a larger batch to filter in-memory since we are intentionally hiding historical duplicates
+    cursor = db["notifications"].find({"user_id": current_user.id}).sort("created_at", -1)
+    raw_notifications = await cursor.to_list(length=1000)
     
-    notifications = await cursor.to_list(length=limit)
-    return [fix_id(n) for n in notifications]
+    filtered_notifications = []
+    has_seen_attendance = False
+    
+    for n in raw_notifications:
+        # Check if it's an attendance-related notification
+        if n.get("type") in ["warning", "success"]:
+            if not has_seen_attendance:
+                filtered_notifications.append(n)
+                has_seen_attendance = True
+            # Older attendance notifications are implicitly skipped/hidden
+        else:
+            # Always pass through all other types of notifications
+            filtered_notifications.append(n)
+            
+    # Apply pagination on the filtered results
+    paginated = filtered_notifications[skip : skip + limit]
+    
+    return [fix_id(n) for n in paginated]
 
 @router.put("/{notification_id}/read")
 async def mark_notification_read(
