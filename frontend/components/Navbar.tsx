@@ -29,9 +29,9 @@ export default function Navbar() {
     };
 
     return (
-        <nav className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-50 overflow-x-auto transition-colors">
-            <div className="px-4 h-16 flex items-center gap-4 min-w-max">
-                <Link href="/dashboard" className="flex items-center gap-2">
+        <nav className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-50 transition-colors">
+            <div className="px-4 h-16 flex items-center gap-4">
+                <Link href="/dashboard" className="flex items-center gap-2 shrink-0">
                     <div className="bg-blue-500 dark:bg-blue-600 rounded-lg p-1.5">
                         <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
