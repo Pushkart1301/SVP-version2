@@ -208,7 +208,7 @@ export default function Navbar() {
                                                                     <span className="w-2 h-2 shrink-0 rounded-full bg-blue-500 mt-1.5"></span>
                                                                 )}
                                                             </div>
-                                                            <p className="text-[13px] leading-relaxed text-gray-600 dark:text-gray-300">
+                                                            <p className="text-[13px] leading-relaxed text-gray-600 dark:text-gray-300 whitespace-pre-wrap">
                                                                 {notification.message}
                                                             </p>
                                                             <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 mt-2 block uppercase tracking-wider">

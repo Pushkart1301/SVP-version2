@@ -33,15 +33,18 @@ class NotificationService:
             for s in subject_stats:
                 if s.current_percentage < threshold:
                     s_name = subject_map.get(s.subject_id, "Unknown Subject")
-                    low_subjects.append(f"{s_name} ({s.current_percentage}%)")
+                    low_subjects.append((s_name, s.current_percentage))
             
-            msg = f"Your overall attendance is {current_pct}%, which is below the 75% threshold."
+            # Sort worst-performing subjects first
+            low_subjects.sort(key=lambda x: x[1])
+            
+            msg = f"You're below the 75% requirement.\n\nOverall: {current_pct}%\n\nSubjects to focus on:"
             if low_subjects:
-                msg += " Subjects needing attention: " + ", ".join(low_subjects) + "."
+                msg += "\n" + "\n".join([f"• {name} – {pct}%" for name, pct in low_subjects])
                 
             notification = {
                 "user_id": current_user.id,
-                "title": "Attendance Warning",
+                "title": "Attendance Alert ⚠️",
                 "message": msg,
                 "type": "warning",
                 "is_read": False,
@@ -57,10 +60,10 @@ class NotificationService:
                 
         elif current_pct >= threshold and last_status == "below":
             # Trigger SUCCESS notification once
-            msg = f"Great job! Your overall attendance is now {current_pct}%, safely above the 75% requirement."
+            msg = f"You're back on track with your attendance.\nKeep it up!\n\nOverall: {current_pct}%"
             notification = {
                 "user_id": current_user.id,
-                "title": "Attendance Goal Reached! 🎉",
+                "title": "Great job 🎉",
                 "message": msg,
                 "type": "success",
                 "is_read": False,
