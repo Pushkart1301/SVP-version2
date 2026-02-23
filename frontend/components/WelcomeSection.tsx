@@ -18,6 +18,7 @@ interface AttendanceStats {
     lectures_attended: number;
     lectures_missed: number;
     overall_percentage: number;
+    month_label?: string;
 }
 
 interface WelcomeSectionProps {
@@ -79,7 +80,9 @@ export function WelcomeSection({ user, stats, monthlyStats, onEditProfile }: Wel
                                 </div>
                                 <div>
                                     <h4 className="text-sm font-bold text-gray-900 dark:text-white">Monthly Progress Tracking</h4>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">Shows month-by-month performance</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
+                                        {monthlyStats?.month_label ? `Progress for ${monthlyStats.month_label}` : "Shows month-by-month performance"}
+                                    </p>
                                 </div>
                             </div>
                         </div>

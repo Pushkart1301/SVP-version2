@@ -62,4 +62,5 @@ class OverallAttendanceStats(BaseModel):
     lectures_attended: int
     lectures_missed: int
     overall_percentage: float
+    month_label: Optional[str] = None
 

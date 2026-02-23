@@ -182,6 +182,7 @@ async def get_overall_attendance_stats(
     absent_classes = 0
     
     query = {"user_id": current_user.id}
+    month_label = None
     
     if mode == "monthly":
         now = datetime.now()
@@ -189,6 +190,7 @@ async def get_overall_attendance_stats(
         m = month if month else now.month
         month_str = f"{m:02d}"
         query["date"] = {"$regex": f"^{y}-{month_str}"}
+        month_label = datetime(y, m, 1).strftime("%B %Y")
     elif mode == "latest_month":
         latest_record = await db["attendance_records"].find_one(
             {"user_id": current_user.id},
@@ -197,9 +199,11 @@ async def get_overall_attendance_stats(
         if latest_record and "date" in latest_record:
             y_m = latest_record["date"][:7]
             query["date"] = {"$regex": f"^{y_m}"}
+            month_label = datetime.strptime(y_m, "%Y-%m").strftime("%B %Y")
         else:
             now = datetime.now()
             query["date"] = {"$regex": f"^{now.year}-{now.month:02d}"}
+            month_label = now.strftime("%B %Y")
         
     # Count attended and absent from attendance records
     cursor = db["attendance_records"].find(query)
@@ -221,7 +225,8 @@ async def get_overall_attendance_stats(
         total_lectures=total_classes,
         lectures_attended=attended_classes,
         lectures_missed=absent_classes,
-        overall_percentage=round(pct, 2)
+        overall_percentage=round(pct, 2),
+        month_label=month_label
     )
 
 @router.delete("/clear")
