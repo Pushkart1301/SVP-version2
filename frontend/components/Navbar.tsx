@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOut, Bell, Moon, Sun, User, ChevronDown, ChevronUp } from "lucide-react";
+import { LogOut, Bell, Moon, Sun, User, ChevronDown, ChevronUp, Check, CheckCircle2, AlertCircle } from "lucide-react";
 import clsx from "clsx";
 import { useTheme } from "@/contexts/ThemeContext";
 import EditProfileModal from "@/components/EditProfileModal";
@@ -15,6 +15,11 @@ export default function Navbar() {
     const [isEditingProfile, setIsEditingProfile] = useState(false);
     const [user, setUser] = useState<{ full_name: string; email: string; profile_image?: string; branch?: string; semester?: string } | null>(null);
 
+    // Notifications State
+    const [notifications, setNotifications] = useState<any[]>([]);
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+    const unreadCount = notifications.filter(n => !n.is_read).length;
+
     const fetchUser = async () => {
         try {
             // api lib handles token injection
@@ -26,9 +31,42 @@ export default function Navbar() {
         }
     };
 
+    const fetchNotifications = async () => {
+        try {
+            const { default: api } = await import("@/lib/api");
+            const res = await api.get("/notifications");
+            if (res.data) {
+                setNotifications(res.data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch notifications", error);
+        }
+    };
+
+    const markAsRead = async (id: string) => {
+        try {
+            const { default: api } = await import("@/lib/api");
+            await api.put(`/notifications/${id}/read`);
+            setNotifications(notifications.map(n => n._id === id ? { ...n, is_read: true } : n));
+        } catch (error) {
+            console.error("Failed to mark notification as read", error);
+        }
+    };
+
+    const markAllAsRead = async () => {
+        try {
+            const { default: api } = await import("@/lib/api");
+            await api.put("/notifications/read-all");
+            setNotifications(notifications.map(n => ({ ...n, is_read: true })));
+        } catch (error) {
+            console.error("Failed to mark all as read", error);
+        }
+    };
+
     React.useEffect(() => {
         if (!pathname.includes("/auth")) {
             fetchUser();
+            fetchNotifications();
         }
     }, [pathname]);
 
@@ -95,20 +133,115 @@ export default function Navbar() {
 
                 {/* Notification and Profile Dropdown */}
                 <div className="flex items-center gap-4 ml-auto relative">
-                    {/* Notification Icon */}
-                    <button
-                        className="relative text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition-colors"
-                        title="Notifications"
-                    >
-                        <Bell size={20} />
-                        {/* Notification Badge */}
-                        <span className="absolute top-1 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-900"></span>
-                    </button>
-
-                    {/* Profile Dropdown */}
+                    {/* Notification Dropdown Container */}
                     <div className="relative">
                         <button
-                            onClick={() => setIsProfileOpen(!isProfileOpen)}
+                            onClick={() => {
+                                setIsNotificationsOpen(!isNotificationsOpen);
+                                setIsProfileOpen(false); // Close profile if open
+                            }}
+                            className={clsx(
+                                "relative text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition-colors",
+                                isNotificationsOpen && "bg-gray-100 dark:bg-gray-800"
+                            )}
+                            title="Notifications"
+                        >
+                            <Bell size={20} />
+                            {/* Notification Badge */}
+                            {unreadCount > 0 && (
+                                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-900"></span>
+                            )}
+                        </button>
+
+                        {/* Notifications Dropdown */}
+                        {isNotificationsOpen && (
+                            <>
+                                {/* Invisible overlay to click outside */}
+                                <div
+                                    className="fixed inset-0 z-40"
+                                    onClick={() => setIsNotificationsOpen(false)}
+                                ></div>
+
+                                <div className="absolute right-0 top-full mt-2 w-80 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                                        <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
+                                        {unreadCount > 0 && (
+                                            <button
+                                                onClick={markAllAsRead}
+                                                className="text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
+                                            >
+                                                <Check className="w-3 h-3" />
+                                                Mark all read
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="max-h-[350px] overflow-y-auto">
+                                        {notifications.length > 0 ? (
+                                            <div className="divide-y divide-gray-100 dark:divide-gray-700/50">
+                                                {notifications.map((notification) => (
+                                                    <div
+                                                        key={notification._id}
+                                                        onClick={() => {
+                                                            if (!notification.is_read) markAsRead(notification._id);
+                                                        }}
+                                                        className={clsx(
+                                                            "px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer flex gap-3",
+                                                            !notification.is_read ? "bg-blue-50/50 dark:bg-blue-900/10" : ""
+                                                        )}
+                                                    >
+                                                        <div className="shrink-0 mt-0.5">
+                                                            {notification.type === "success" ? (
+                                                                <CheckCircle2 className="w-5 h-5 text-green-500" />
+                                                            ) : (
+                                                                <AlertCircle className="w-5 h-5 text-amber-500" />
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex justify-between items-start mb-1">
+                                                                <p className={clsx(
+                                                                    "text-sm font-medium text-gray-900 dark:text-white pr-2",
+                                                                    !notification.is_read && "font-semibold"
+                                                                )}>
+                                                                    {notification.title}
+                                                                </p>
+                                                                {!notification.is_read && (
+                                                                    <span className="w-2 h-2 shrink-0 rounded-full bg-blue-500 mt-1.5"></span>
+                                                                )}
+                                                            </div>
+                                                            <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-3">
+                                                                {notification.message}
+                                                            </p>
+                                                            <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-1 block">
+                                                                {new Date(notification.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="py-8 text-center px-4">
+                                                <Bell className="w-8 h-8 mx-auto text-gray-300 dark:text-gray-600 mb-2" />
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">No notifications yet</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="p-2 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 text-center">
+                                        <button className="text-xs font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors py-1 w-full rounded hover:bg-gray-200/50 dark:hover:bg-gray-700/50">
+                                            View old notifications
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    {/* Profile Dropdown Container */}
+                    <div className="relative">
+                        <button
+                            onClick={() => {
+                                setIsProfileOpen(!isProfileOpen);
+                                setIsNotificationsOpen(false); // Close notifications if open
+                            }}
                             className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 group"
                             aria-label="User menu"
                         >
