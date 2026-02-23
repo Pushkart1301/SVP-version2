@@ -38,6 +38,7 @@ const Dashboard = () => {
     const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
     const [chartStats, setChartStats] = useState<AttendanceStats | null>(null);
+    const [overallChartData, setOverallChartData] = useState<any[]>([]);
     const [isChartLoading, setIsChartLoading] = useState(false);
 
     useEffect(() => {
@@ -50,11 +51,53 @@ const Dashboard = () => {
     const fetchChartData = async (mode: 'monthly' | 'overall', month: number, year: number) => {
         setIsChartLoading(true);
         try {
-            const url = mode === 'monthly'
-                ? `/attendance/stats/overall?mode=monthly&month=${month}&year=${year}`
-                : `/attendance/stats/overall?mode=overall`;
-            const res = await api.get(url);
-            setChartStats(res.data);
+            if (mode === 'monthly') {
+                const url = `/attendance/stats/overall?mode=monthly&month=${month}&year=${year}`;
+                const res = await api.get(url);
+                setChartStats(res.data);
+            } else {
+                // Fetch full history to calculate month-by-month data
+                const res = await api.get("/attendance/history");
+                const history = res.data;
+
+                // Group by month
+                const monthlyData: Record<string, { p: number, total: number }> = {};
+
+                history.forEach((record: any) => {
+                    if (!record.date) return;
+                    const dateObj = new Date(record.date);
+                    const monthKey = dateObj.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                    // To sort properly later
+                    const sortKey = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
+                    const key = `${sortKey}|${monthKey}`;
+
+                    if (!monthlyData[key]) {
+                        monthlyData[key] = { p: 0, total: 0 };
+                    }
+
+                    record.entries?.forEach((entry: any) => {
+                        if (entry.status === 'P') monthlyData[key].p++;
+                        if (entry.status === 'P' || entry.status === 'A') monthlyData[key].total++;
+                    });
+                });
+
+                // Convert to array and sort chronologically
+                const sortedKeys = Object.keys(monthlyData).sort();
+                const processedData = sortedKeys.map(key => {
+                    const label = key.split('|')[1];
+                    const data = monthlyData[key];
+                    const percentage = data.total > 0 ? (data.p / data.total) * 100 : 0;
+                    return {
+                        name: label,
+                        percentage: Number(percentage.toFixed(1)),
+                        target: 75
+                    };
+                });
+
+                setOverallChartData(processedData);
+
+                // Also optionally set overall chart stats to power the banner if needed, though they are natively fetched in fetchData
+            }
         } catch (error) {
             console.error("Failed to fetch chart data", error);
         } finally {
@@ -124,13 +167,19 @@ const Dashboard = () => {
 
     // Generate attendance graph data
     const generateAttendanceGraphData = (stats: AttendanceStats | null) => {
+        if (viewMode === 'overall') {
+            return overallChartData.length > 0 ? overallChartData : [
+                { name: 'No data', percentage: 0, target: 75 }
+            ];
+        }
+
         if (!stats || stats.total_lectures === 0) {
-            // Return sample/placeholder data
+            // Return sample/placeholder data for monthly
             return [
-                { week: 'Week 1', percentage: 0, target: 75 },
-                { week: 'Week 2', percentage: 0, target: 75 },
-                { week: 'Week 3', percentage: 0, target: 75 },
-                { week: 'Week 4', percentage: 0, target: 75 },
+                { name: 'Week 1', percentage: 0, target: 75 },
+                { name: 'Week 2', percentage: 0, target: 75 },
+                { name: 'Week 3', percentage: 0, target: 75 },
+                { name: 'Week 4', percentage: 0, target: 75 },
             ];
         }
 
@@ -139,10 +188,10 @@ const Dashboard = () => {
 
         // Generate trend data showing progress towards current percentage
         return [
-            { week: 'Week 1', percentage: Math.max(0, currentPercentage - 15), target: 75 },
-            { week: 'Week 2', percentage: Math.max(0, currentPercentage - 10), target: 75 },
-            { week: 'Week 3', percentage: Math.max(0, currentPercentage - 5), target: 75 },
-            { week: 'Week 4', percentage: currentPercentage, target: 75 },
+            { name: 'Week 1', percentage: Math.max(0, currentPercentage - 15), target: 75 },
+            { name: 'Week 2', percentage: Math.max(0, currentPercentage - 10), target: 75 },
+            { name: 'Week 3', percentage: Math.max(0, currentPercentage - 5), target: 75 },
+            { name: 'Week 4', percentage: currentPercentage, target: 75 },
         ];
     };
 
@@ -347,7 +396,7 @@ const Dashboard = () => {
                                         <LineChart data={generateAttendanceGraphData(chartStats)}>
                                             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" className="dark:stroke-gray-700" />
                                             <XAxis
-                                                dataKey="week"
+                                                dataKey="name"
                                                 stroke="#94a3b8"
                                                 style={{ fontSize: '12px' }}
                                             />
