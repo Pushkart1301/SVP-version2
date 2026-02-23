@@ -189,6 +189,17 @@ async def get_overall_attendance_stats(
         m = month if month else now.month
         month_str = f"{m:02d}"
         query["date"] = {"$regex": f"^{y}-{month_str}"}
+    elif mode == "latest_month":
+        latest_record = await db["attendance_records"].find_one(
+            {"user_id": current_user.id},
+            sort=[("date", -1)]
+        )
+        if latest_record and "date" in latest_record:
+            y_m = latest_record["date"][:7]
+            query["date"] = {"$regex": f"^{y_m}"}
+        else:
+            now = datetime.now()
+            query["date"] = {"$regex": f"^{now.year}-{now.month:02d}"}
         
     # Count attended and absent from attendance records
     cursor = db["attendance_records"].find(query)

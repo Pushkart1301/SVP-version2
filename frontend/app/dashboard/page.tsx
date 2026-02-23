@@ -29,6 +29,7 @@ const Dashboard = () => {
     const router = useRouter();
     const [user, setUser] = useState<UserProfile | null>(null);
     const [stats, setStats] = useState<AttendanceStats | null>(null);
+    const [monthlyStats, setMonthlyStats] = useState<AttendanceStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
 
@@ -70,12 +71,14 @@ const Dashboard = () => {
 
     const fetchData = async () => {
         try {
-            const [userRes, statsRes] = await Promise.all([
+            const [userRes, statsRes, monthlyStatsRes] = await Promise.all([
                 api.get("/auth/me"),
-                api.get("/attendance/stats/overall")
+                api.get("/attendance/stats/overall"),
+                api.get(`/attendance/stats/overall?mode=latest_month`)
             ]);
             setUser(userRes.data);
             setStats(statsRes.data);
+            setMonthlyStats(monthlyStatsRes.data);
         } catch (error) {
             console.error("Failed to fetch data", error);
         } finally {
@@ -164,6 +167,7 @@ const Dashboard = () => {
                         <WelcomeSection
                             user={user}
                             stats={stats}
+                            monthlyStats={monthlyStats}
                             onEditProfile={() => setIsEditing(true)}
                         />
                     </div>
