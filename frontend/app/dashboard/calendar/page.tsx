@@ -95,16 +95,26 @@ export default function CalendarPage() {
             return [];
         }
 
-        // Map subject IDs to full subject info with time slots
-        // Add a unique index for each slot to handle same subject appearing multiple times
-        return daySchedule.slots.map((slot, index) => {
+        // Map subject IDs to full subject info and merge duplicate subjects
+        const uniqueSubjects = new Map();
+
+        daySchedule.slots.forEach((slot, index) => {
             const subject = subjects.find(s => s._id === slot.subject_id);
-            return subject ? {
-                ...subject,
-                timeSlot: `${slot.start_time} - ${slot.end_time}`,
-                slotIndex: index  // Unique identifier for this specific slot
-            } : null;
-        }).filter(Boolean);
+            if (subject) {
+                if (uniqueSubjects.has(subject._id)) {
+                    const existing = uniqueSubjects.get(subject._id);
+                    existing.timeSlot += `, ${slot.start_time} - ${slot.end_time}`;
+                } else {
+                    uniqueSubjects.set(subject._id, {
+                        ...subject,
+                        timeSlot: `${slot.start_time} - ${slot.end_time}`,
+                        slotIndex: index
+                    });
+                }
+            }
+        });
+
+        return Array.from(uniqueSubjects.values());
     };
 
     const handleMark = async (subjectId: string, status: "P" | "A") => {
