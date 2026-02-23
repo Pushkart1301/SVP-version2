@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { Card, Button } from "@/components/ui";
-import { ChevronLeft, ChevronRight, X, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Clock, CheckSquare, Check, Minus, Edit2 } from "lucide-react";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const WEEKDAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -347,76 +347,85 @@ export default function CalendarPage() {
                     }}
                 >
                     <Card
-                        className="w-full max-w-lg bg-white dark:bg-[#0F172A] border-slate-200 dark:border-white/20 max-h-[80vh] overflow-y-auto transition-all"
+                        className="w-full max-w-[400px] bg-[#111317] border-0 rounded-2xl p-6 max-h-[85vh] overflow-y-auto shadow-2xl"
                         onClick={(e) => e.stopPropagation()}
                         style={{
                             animation: 'modalSlideIn 0.3s ease-out'
                         }}
                     >
-                        <div className="flex items-center justify-between mb-6">
-                            <div>
-                                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Mark Attendance</h3>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{weekdayName}, {getDateKey(selectedDate)}</p>
+                        <div className="flex justify-between items-start mb-6">
+                            <div className="w-10"></div> {/* Spacer for centering the icon */}
+                            <div className="flex flex-col items-center">
+                                <div className="w-12 h-12 bg-[#1A1D24] rounded-xl flex items-center justify-center mb-4">
+                                    <CheckSquare size={24} className="text-white" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-1">Review Attendance</h3>
+                                <div className="flex items-center gap-2 text-[#8F93A3] text-sm font-medium">
+                                    <Clock size={14} />
+                                    {selectedDate?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                                </div>
                             </div>
                             <button onClick={() => {
                                 setSelectedDate(null);
                                 setIsEditMode(false);
-                            }} className="text-slate-400 hover:text-slate-900 dark:hover:text-white"><X size={24} /></button>
+                            }} className="text-[#8F93A3] hover:text-white w-10 flex justify-end">
+                                <X size={20} />
+                            </button>
                         </div>
 
                         {scheduledSubjects.length > 0 ? (
                             <div className="space-y-3">
                                 {scheduledSubjects.map((sub: any) => {
                                     const dateKey = getDateKey(selectedDate);
-
-                                    // Find the attendance entry for this specific subject
                                     const entry = attendanceMap[dateKey]?.entries?.find((e: any) => e.subject_id === sub._id);
                                     const status = entry?.status;
 
                                     return (
-                                        <div key={`${sub._id}-${sub.slotIndex}`} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/10">
+                                        <div key={`${sub._id}-${sub.slotIndex}`} className="flex items-center justify-between p-4 bg-[#1A1D24] rounded-xl border border-white/5">
                                             <div className="flex-1">
-                                                <div className="font-medium text-gray-900 dark:text-white">{sub.name}</div>
-                                                <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
+                                                <div className="font-semibold tracking-wide text-white mb-1">{sub.name}</div>
+                                                <div className="text-xs text-[#8F93A3] flex items-center gap-1 font-medium">
                                                     <Clock size={12} />
                                                     {sub.timeSlot}
                                                 </div>
                                             </div>
-                                            <div className="flex gap-2">
+                                            <div className="flex gap-2 shrink-0 ml-4">
                                                 {attendanceMap[dateKey] && !isEditMode ? (
-                                                    <div className={`px-4 py-2 rounded font-bold ${status === 'P' ? 'bg-green-500/20 text-green-600 dark:text-green-400' : status === 'A' ? 'bg-red-500/20 text-red-600 dark:text-red-400' : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400'}`}>
-                                                        {status || '-'}
+                                                    <div className={`px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2 ${status === 'P' ? 'bg-[#2BE67D] text-[#111317]' : status === 'A' ? 'bg-[#1A1D24] border border-[#2B2F36] text-white' : 'bg-white/10 text-[#8F93A3]'}`}>
+                                                        {status === 'P' && <Check size={16} />}
+                                                        {status === 'A' && <Minus size={16} className="text-[#8F93A3]" />}
+                                                        {status === 'P' ? 'Present' : status === 'A' ? 'Absent' : '-'}
                                                     </div>
                                                 ) : (
-                                                    <>
+                                                    <div className="bg-[#111317] rounded-full p-1 border border-white/5 flex">
                                                         <button
                                                             type="button"
                                                             onClick={() => handleMark(sub._id, "P")}
-                                                            className={`px-4 py-2 rounded font-bold transition-all ${status === 'P' ? 'bg-green-500 text-white' : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400 hover:bg-green-500/20'}`}
+                                                            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${status === 'P' ? 'bg-[#2BE67D] text-[#111317]' : 'text-[#8F93A3] hover:text-white'}`}
                                                         >
                                                             P
                                                         </button>
                                                         <button
                                                             type="button"
                                                             onClick={() => handleMark(sub._id, "A")}
-                                                            className={`px-4 py-2 rounded font-bold transition-all ${status === 'A' ? 'bg-red-500 text-white' : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400 hover:bg-red-500/20'}`}
+                                                            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${status === 'A' ? 'bg-[#FF4646] text-white' : 'text-[#8F93A3] hover:text-white'}`}
                                                         >
                                                             A
                                                         </button>
-                                                    </>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
                                     )
                                 })}
                                 {attendanceMap[getDateKey(selectedDate)] && !isEditMode && (
-                                    <Button
-                                        variant="outline"
+                                    <button
                                         onClick={() => setIsEditMode(true)}
-                                        className="w-full mt-4 dark:bg-white/10 dark:hover:bg-white/20 dark:text-white dark:border-0 shadow-none font-medium"
+                                        className="w-full mt-6 bg-[#2BE67D] hover:bg-[#25C86C] text-[#111317] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"
                                     >
-                                        Edit Attendance
-                                    </Button>
+                                        <Edit2 size={18} />
+                                        Modify Attendance
+                                    </button>
                                 )}
                             </div>
                         ) : (
