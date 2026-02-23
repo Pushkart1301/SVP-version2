@@ -5,15 +5,14 @@ interface StatCardProps {
     icon: React.ReactNode;
     value: string | number;
     label: string;
-    bgColor: string;
     iconColor: string;
 }
 
-function StatCard({ icon, value, label, bgColor, iconColor }: StatCardProps) {
+function StatCard({ icon, value, label, iconColor }: StatCardProps) {
     return (
         <div className="group overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
             <div className="flex flex-col gap-3">
-                <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${bgColor} dark:bg-opacity-20 transition-transform group-hover:scale-110`}>
+                <div className={`transition-transform group-hover:scale-110`}>
                     <div className={iconColor}>
                         {icon}
                     </div>
