@@ -31,6 +31,7 @@ export default function CalendarPage() {
     const [schedule, setSchedule] = useState<WeekdaySchedule[]>([]);
     const [attendanceMap, setAttendanceMap] = useState<Record<string, any>>({});
     const [loading, setLoading] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(false);
 
     // Helper to format date key locally (YYYY-MM-DD)
     const getDateKey = (date: Date) => {
@@ -106,25 +107,18 @@ export default function CalendarPage() {
         }).filter(Boolean);
     };
 
-    const handleMark = async (subjectId: string, status: "P" | "A", slotIndex?: number) => {
+    const handleMark = async (subjectId: string, status: "P" | "A") => {
         if (!selectedDate) return;
 
         const dateKey = getDateKey(selectedDate);
         const currentEntries = attendanceMap[dateKey]?.entries || [];
 
-        // If slotIndex is provided, create a unique identifier
-        const uniqueId = slotIndex !== undefined ? `${subjectId}_slot${slotIndex}` : subjectId;
-
-        // Remove existing entry for this subject/slot and add new one
+        // Remove existing entry for this subject and add new one
         const newEntries = [
-            ...currentEntries.filter((e: any) => {
-                const entryId = e.slot_index !== undefined ? `${e.subject_id}_slot${e.slot_index}` : e.subject_id;
-                return entryId !== uniqueId;
-            }),
+            ...currentEntries.filter((e: any) => e.subject_id !== subjectId),
             {
                 subject_id: subjectId,
-                status,
-                slot_index: slotIndex
+                status
             }
         ];
 
@@ -137,6 +131,10 @@ export default function CalendarPage() {
             }
         };
         setAttendanceMap(updatedMap);
+
+        // If we just created the first entry for this date, force Edit Mode 
+        // to stay open so the user can easily mark the rest of the subjects.
+        setIsEditMode(true);
 
         // Save to backend
         try {
@@ -182,7 +180,10 @@ export default function CalendarPage() {
             days.push(
                 <div
                     key={dateKey}
-                    onClick={() => setSelectedDate(date)}
+                    onClick={() => {
+                        setSelectedDate(date);
+                        setIsEditMode(false);
+                    }}
                     className={`
                         h-20 sm:h-24 border-2 rounded-lg p-2 sm:p-3 cursor-pointer 
                         transition-all duration-200 relative
@@ -327,7 +328,10 @@ export default function CalendarPage() {
             {selectedDate && (
                 <div
                     className="fixed top-[10px] inset-x-0 bottom-0 bg-black/60 flex items-center justify-center z-40 p-4 transition-all duration-200"
-                    onClick={() => setSelectedDate(null)}
+                    onClick={() => {
+                        setSelectedDate(null);
+                        setIsEditMode(false);
+                    }}
                     style={{
                         animation: 'fadeIn 0.2s ease-out'
                     }}
@@ -344,30 +348,20 @@ export default function CalendarPage() {
                                 <h3 className="text-xl font-bold text-white">Mark Attendance</h3>
                                 <p className="text-sm text-slate-400 mt-1">{weekdayName}, {getDateKey(selectedDate)}</p>
                             </div>
-                            <button onClick={() => setSelectedDate(null)} className="text-slate-400 hover:text-white"><X size={24} /></button>
+                            <button onClick={() => {
+                                setSelectedDate(null);
+                                setIsEditMode(false);
+                            }} className="text-slate-400 hover:text-white"><X size={24} /></button>
                         </div>
 
                         {scheduledSubjects.length > 0 ? (
                             <div className="space-y-3">
                                 {scheduledSubjects.map((sub: any) => {
                                     const dateKey = getDateKey(selectedDate);
-                                    const uniqueId = `${sub._id}_slot${sub.slotIndex}`;
 
-                                    // Find the attendance entry for this specific subject/slot
-                                    const entry = attendanceMap[dateKey]?.entries?.find((e: any) => {
-                                        const entryId = e.slot_index !== undefined ? `${e.subject_id}_slot${e.slot_index}` : e.subject_id;
-                                        return entryId === uniqueId;
-                                    });
+                                    // Find the attendance entry for this specific subject
+                                    const entry = attendanceMap[dateKey]?.entries?.find((e: any) => e.subject_id === sub._id);
                                     const status = entry?.status;
-
-                                    // Debug logging
-                                    console.log("Rendering subject:", sub.name, {
-                                        dateKey,
-                                        uniqueId,
-                                        entry,
-                                        status,
-                                        allEntriesForDate: attendanceMap[dateKey]?.entries
-                                    });
 
                                     return (
                                         <div key={`${sub._id}-${sub.slotIndex}`} className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
@@ -379,24 +373,40 @@ export default function CalendarPage() {
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleMark(sub._id, "P", sub.slotIndex)}
-                                                    className={`px-4 py-2 rounded font-bold transition-all ${status === 'P' ? 'bg-green-500 text-white' : 'bg-white/10 text-slate-400 hover:bg-green-500/20'}`}
-                                                >
-                                                    P
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleMark(sub._id, "A", sub.slotIndex)}
-                                                    className={`px-4 py-2 rounded font-bold transition-all ${status === 'A' ? 'bg-red-500 text-white' : 'bg-white/10 text-slate-400 hover:bg-red-500/20'}`}
-                                                >
-                                                    A
-                                                </button>
+                                                {attendanceMap[dateKey] && !isEditMode ? (
+                                                    <div className={`px-4 py-2 rounded font-bold ${status === 'P' ? 'bg-green-500/20 text-green-400' : status === 'A' ? 'bg-red-500/20 text-red-400' : 'bg-white/10 text-slate-400'}`}>
+                                                        {status || '-'}
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleMark(sub._id, "P")}
+                                                            className={`px-4 py-2 rounded font-bold transition-all ${status === 'P' ? 'bg-green-500 text-white' : 'bg-white/10 text-slate-400 hover:bg-green-500/20'}`}
+                                                        >
+                                                            P
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleMark(sub._id, "A")}
+                                                            className={`px-4 py-2 rounded font-bold transition-all ${status === 'A' ? 'bg-red-500 text-white' : 'bg-white/10 text-slate-400 hover:bg-red-500/20'}`}
+                                                        >
+                                                            A
+                                                        </button>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     )
                                 })}
+                                {attendanceMap[getDateKey(selectedDate)] && !isEditMode && (
+                                    <Button
+                                        onClick={() => setIsEditMode(true)}
+                                        className="w-full mt-4 bg-white/10 hover:bg-white/20 text-white border-0"
+                                    >
+                                        Edit Attendance
+                                    </Button>
+                                )}
                             </div>
                         ) : (
                             <div className="text-center py-12 px-4">

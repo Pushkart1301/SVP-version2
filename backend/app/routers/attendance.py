@@ -93,8 +93,14 @@ async def mark_attendance(
     # ... (rest of function)
     date_str = attendance.date.isoformat()
     
+    # Deduplicate entries en route (last one wins)
+    unique_entries = {}
+    for entry in attendance.entries:
+        unique_entries[entry.subject_id] = entry
+    
     att_data = attendance.model_dump()
     att_data["date"] = date_str # Store as string for simpler querying or ISODate
+    att_data["entries"] = [e.model_dump() for e in unique_entries.values()]
     att_data["user_id"] = current_user.id
     
     await db["attendance_records"].replace_one(
