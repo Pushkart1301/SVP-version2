@@ -162,7 +162,7 @@ export default function Navbar() {
                                     onClick={() => setIsNotificationsOpen(false)}
                                 ></div>
 
-                                <div className="absolute right-0 top-full mt-2 w-80 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                                <div className="absolute right-0 top-full mt-2 w-[400px] sm:w-[450px] rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
                                     <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
                                         <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
                                         {unreadCount > 0 && (
@@ -175,7 +175,7 @@ export default function Navbar() {
                                             </button>
                                         )}
                                     </div>
-                                    <div className="max-h-[350px] overflow-y-auto">
+                                    <div className="max-h-[450px] overflow-y-auto">
                                         {notifications.length > 0 ? (
                                             <div className="divide-y divide-gray-100 dark:divide-gray-700/50">
                                                 {notifications.map((notification) => (
@@ -208,10 +208,10 @@ export default function Navbar() {
                                                                     <span className="w-2 h-2 shrink-0 rounded-full bg-blue-500 mt-1.5"></span>
                                                                 )}
                                                             </div>
-                                                            <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-3">
+                                                            <p className="text-[13px] leading-relaxed text-gray-600 dark:text-gray-300">
                                                                 {notification.message}
                                                             </p>
-                                                            <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-1 block">
+                                                            <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 mt-2 block uppercase tracking-wider">
                                                                 {new Date(notification.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                                             </span>
                                                         </div>

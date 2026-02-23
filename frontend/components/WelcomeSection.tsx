@@ -63,7 +63,7 @@ export function WelcomeSection({ user, stats, monthlyStats, onEditProfile }: Wel
                         </p>
                         {user?.branch && (
                             <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-1 inline-flex px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30">
-                                AIML Specialization
+                                {user.branch} Specialization
                             </p>
                         )}
                     </div>
