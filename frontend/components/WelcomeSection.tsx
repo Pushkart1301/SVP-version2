@@ -70,7 +70,7 @@ export function WelcomeSection({ user, stats, monthlyStats, onEditProfile }: Wel
                 </div>
 
                 {/* Attendance Progress Bars */}
-                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 lg:w-2/3">
+                <div className="flex-1 flex flex-col justify-center gap-4 lg:w-2/3">
                     {/* Monthly Progress Tracking */}
                     <div className="bg-gray-50/50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-100 dark:border-gray-700/50 relative overflow-hidden group hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
                         <div className="flex items-start justify-between mb-3">
