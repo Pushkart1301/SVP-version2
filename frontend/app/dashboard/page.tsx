@@ -32,6 +32,42 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
 
+    // Chart specific states
+    const [viewMode, setViewMode] = useState<'monthly' | 'overall'>('monthly');
+    const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
+    const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+    const [chartStats, setChartStats] = useState<AttendanceStats | null>(null);
+    const [isChartLoading, setIsChartLoading] = useState(false);
+
+    useEffect(() => {
+        const savedMode = localStorage.getItem('attendanceViewMode') as 'monthly' | 'overall';
+        if (savedMode === 'overall' || savedMode === 'monthly') {
+            setViewMode(savedMode);
+        }
+    }, []);
+
+    const fetchChartData = async (mode: 'monthly' | 'overall', month: number, year: number) => {
+        setIsChartLoading(true);
+        try {
+            const url = mode === 'monthly'
+                ? `/attendance/stats/overall?mode=monthly&month=${month}&year=${year}`
+                : `/attendance/stats/overall?mode=overall`;
+            const res = await api.get(url);
+            setChartStats(res.data);
+        } catch (error) {
+            console.error("Failed to fetch chart data", error);
+        } finally {
+            setIsChartLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        // Only fetch if not initializing auth
+        if (!loading) {
+            fetchChartData(viewMode, selectedMonth, selectedYear);
+        }
+    }, [viewMode, selectedMonth, selectedYear, loading]);
+
     const fetchData = async () => {
         try {
             const [userRes, statsRes] = await Promise.all([
@@ -199,56 +235,122 @@ const Dashboard = () => {
                     <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                             {/* Attendance Graph - Takes 2 columns on large screens */}
-                            <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm transition-colors">
-                                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                                    <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                                    Attendance Tracking (Last 30 Days)
-                                </h4>
-                                <ResponsiveContainer width="100%" height={280}>
-                                    <LineChart data={generateAttendanceGraphData(stats)}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" className="dark:stroke-gray-700" />
-                                        <XAxis
-                                            dataKey="week"
-                                            stroke="#94a3b8"
-                                            style={{ fontSize: '12px' }}
-                                        />
-                                        <YAxis
-                                            stroke="#94a3b8"
-                                            style={{ fontSize: '12px' }}
-                                            domain={[0, 100]}
-                                            label={{ value: 'Attendance %', angle: -90, position: 'insideLeft', style: { fontSize: '12px', fill: '#64748b' } }}
-                                        />
-                                        <Tooltip
-                                            contentStyle={{
-                                                backgroundColor: 'white',
-                                                border: '1px solid #e2e8f0',
-                                                borderRadius: '8px',
-                                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                                            }}
-                                        />
-                                        <Legend />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="percentage"
-                                            stroke="#3b82f6"
-                                            strokeWidth={3}
-                                            dot={{ fill: '#3b82f6', r: 5 }}
-                                            activeDot={{ r: 7 }}
-                                            name="Attendance %"
-                                        />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="target"
-                                            stroke="#10b981"
-                                            strokeWidth={2}
-                                            strokeDasharray="5 5"
-                                            dot={false}
-                                            name="Target (75%)"
-                                        />
-                                    </LineChart>
-                                </ResponsiveContainer>
+                            <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm transition-colors relative min-h-[380px]">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                                    <h4 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2 group relative">
+                                        <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                                        {viewMode === 'monthly' ? 'Attendance Tracking (Monthly)' : 'Attendance Tracking (Overall)'}
+                                        <div
+                                            className="ml-1 cursor-help flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-xs font-bold leading-none"
+                                            title={viewMode === 'monthly' ? "Shows attendance trend for the selected month" : "Shows cumulative attendance till date"}
+                                        >
+                                            i
+                                        </div>
+                                    </h4>
+
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        {viewMode === 'monthly' && (
+                                            <div className="flex items-center gap-2 animate-fade-in pr-2 border-r border-gray-200 dark:border-gray-700">
+                                                <select
+                                                    value={selectedMonth}
+                                                    onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                                                    className="text-sm bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 dark:text-gray-200 font-medium min-h-[36px]"
+                                                >
+                                                    {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                                                        <option key={m} value={m}>{new Date(2000, m - 1, 1).toLocaleString('default', { month: 'short' })}</option>
+                                                    ))}
+                                                </select>
+                                                <select
+                                                    value={selectedYear}
+                                                    onChange={(e) => setSelectedYear(Number(e.target.value))}
+                                                    className="text-sm bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 dark:text-gray-200 font-medium min-h-[36px]"
+                                                >
+                                                    {[new Date().getFullYear() - 1, new Date().getFullYear(), new Date().getFullYear() + 1].map(y => (
+                                                        <option key={y} value={y}>{y}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        )}
+
+                                        <div
+                                            role="group"
+                                            aria-label="View Mode"
+                                            className="flex p-1 bg-gray-100 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800"
+                                        >
+                                            <button
+                                                onClick={() => {
+                                                    setViewMode('monthly');
+                                                    localStorage.setItem('attendanceViewMode', 'monthly');
+                                                }}
+                                                className={`px-4 py-1 text-sm font-medium rounded-lg transition-all min-h-[28px] ${viewMode === 'monthly' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                            >
+                                                Monthly
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setViewMode('overall');
+                                                    localStorage.setItem('attendanceViewMode', 'overall');
+                                                }}
+                                                className={`px-4 py-1 text-sm font-medium rounded-lg transition-all min-h-[28px] ${viewMode === 'overall' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                            >
+                                                Overall
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {isChartLoading ? (
+                                    <div className="w-full flex flex-col items-center justify-center bg-gray-50/50 dark:bg-gray-800/50 rounded-xl min-h-[280px]">
+                                        <div className="w-8 h-8 rounded-full border-2 border-blue-500 border-t-transparent animate-spin mb-3"></div>
+                                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Loading chart data...</span>
+                                    </div>
+                                ) : (
+                                    <ResponsiveContainer width="100%" height={280} className="animate-fade-in">
+                                        <LineChart data={generateAttendanceGraphData(chartStats)}>
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" className="dark:stroke-gray-700" />
+                                            <XAxis
+                                                dataKey="week"
+                                                stroke="#94a3b8"
+                                                style={{ fontSize: '12px' }}
+                                            />
+                                            <YAxis
+                                                stroke="#94a3b8"
+                                                style={{ fontSize: '12px' }}
+                                                domain={[0, 100]}
+                                                label={{ value: 'Attendance %', angle: -90, position: 'insideLeft', style: { fontSize: '12px', fill: '#64748b' } }}
+                                            />
+                                            <Tooltip
+                                                contentStyle={{
+                                                    backgroundColor: 'white',
+                                                    border: '1px solid #e2e8f0',
+                                                    borderRadius: '8px',
+                                                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                                                }}
+                                            />
+                                            <Legend />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="percentage"
+                                                stroke="#3b82f6"
+                                                strokeWidth={3}
+                                                dot={{ fill: '#3b82f6', r: 5 }}
+                                                activeDot={{ r: 7 }}
+                                                name="Attendance %"
+                                            />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="target"
+                                                stroke="#10b981"
+                                                strokeWidth={2}
+                                                strokeDasharray="5 5"
+                                                dot={false}
+                                                name="Target (75%)"
+                                            />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                )}
                                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
-                                    Track your attendance trends to identify patterns and plan better
+                                    {viewMode === 'monthly' ? "Track your monthly attendance trends to stay on top of your goal" : "Your overall cumulative attendance over time"}
                                 </p>
                             </div>
 

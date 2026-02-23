@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from bson import ObjectId
 
@@ -172,14 +172,26 @@ async def get_attendance_stats(
 
 @router.get("/stats/overall", response_model=OverallAttendanceStats)
 async def get_overall_attendance_stats(
+    mode: str = Query("overall"),
+    month: int = Query(None),
+    year: int = Query(None),
     current_user: UserResponse = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(database.get_database)
 ):
     attended_classes = 0
     absent_classes = 0
     
+    query = {"user_id": current_user.id}
+    
+    if mode == "monthly":
+        now = datetime.now()
+        y = year if year else now.year
+        m = month if month else now.month
+        month_str = f"{m:02d}"
+        query["date"] = {"$regex": f"^{y}-{month_str}"}
+        
     # Count attended and absent from attendance records
-    cursor = db["attendance_records"].find({"user_id": current_user.id})
+    cursor = db["attendance_records"].find(query)
     async for record in cursor:
         for entry in record.get("entries", []):
             status = entry["status"]
