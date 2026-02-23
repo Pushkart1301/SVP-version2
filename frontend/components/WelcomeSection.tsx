@@ -87,16 +87,6 @@ export function WelcomeSection({ user, stats, onEditProfile }: WelcomeSectionPro
                             : `✓ ${(currentAttendance - targetAttendance).toFixed(1)}% above target (${targetAttendance}%)`}
                     </p>
                 </div>
-
-                {/* Edit Button */}
-                <Button
-                    variant="outline"
-                    onClick={onEditProfile}
-                    className="self-start sm:self-center border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:!bg-gray-200 dark:hover:!bg-gray-600 hover:shadow transition-all cursor-pointer text-gray-900 dark:text-white"
-                >
-                    <Edit3 className="mr-2 h-4 w-4" />
-                    Edit Profile
-                </Button>
             </div>
         </div>
     );
