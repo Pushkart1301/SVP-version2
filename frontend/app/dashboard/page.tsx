@@ -238,6 +238,40 @@ const Dashboard = () => {
                     {/* Attendance Tracking Graph & Your Tools Side by Side */}
                     <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                            {/* Your Tools - Takes 1 column on large screens */}
+                            <div className="lg:col-span-1 bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col transition-colors">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                    <span className="text-blue-600 dark:text-blue-400">⚡</span>
+                                    Your Tools
+                                </h3>
+                                <div className="flex flex-col gap-2.5 flex-1">
+                                    {featureCards.map((card) => (
+                                        <div
+                                            key={card.title}
+                                            onClick={() => router.push(card.path)}
+                                            className="group flex items-start gap-3 p-3 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition-all duration-200 cursor-pointer bg-gray-50 dark:bg-gray-900 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                                        >
+                                            {/* Icon */}
+                                            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 group-hover:border-blue-400 dark:group-hover:border-blue-500 group-hover:bg-blue-500 dark:group-hover:bg-blue-600 transition-colors">
+                                                <card.icon className="w-4 h-4 text-gray-600 dark:text-gray-300 group-hover:text-white transition-colors" />
+                                            </div>
+
+                                            {/* Content */}
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors mb-0.5">
+                                                    {card.title}
+                                                </h4>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-2 leading-relaxed transition-colors">
+                                                    {card.description}
+                                                </p>
+                                            </div>
+
+                                            {/* Arrow */}
+                                            <ArrowRight className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                             {/* Attendance Graph - Takes 2 columns on large screens */}
                             <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm transition-colors relative min-h-[380px]">
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
@@ -358,40 +392,6 @@ const Dashboard = () => {
                                 </p>
                             </div>
 
-                            {/* Your Tools - Takes 1 column on large screens */}
-                            <div className="lg:col-span-1 bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col transition-colors">
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                                    <span className="text-blue-600 dark:text-blue-400">⚡</span>
-                                    Your Tools
-                                </h3>
-                                <div className="flex flex-col gap-2.5 flex-1">
-                                    {featureCards.map((card) => (
-                                        <div
-                                            key={card.title}
-                                            onClick={() => router.push(card.path)}
-                                            className="group flex items-start gap-3 p-3 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition-all duration-200 cursor-pointer bg-gray-50 dark:bg-gray-900 hover:bg-blue-50 dark:hover:bg-blue-900/30"
-                                        >
-                                            {/* Icon */}
-                                            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 group-hover:border-blue-400 dark:group-hover:border-blue-500 group-hover:bg-blue-500 dark:group-hover:bg-blue-600 transition-colors">
-                                                <card.icon className="w-4 h-4 text-gray-600 dark:text-gray-300 group-hover:text-white transition-colors" />
-                                            </div>
-
-                                            {/* Content */}
-                                            <div className="flex-1 min-w-0">
-                                                <h4 className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors mb-0.5">
-                                                    {card.title}
-                                                </h4>
-                                                <p className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-2 leading-relaxed transition-colors">
-                                                    {card.description}
-                                                </p>
-                                            </div>
-
-                                            {/* Arrow */}
-                                            <ArrowRight className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
                         </div>
                     </div>
 
