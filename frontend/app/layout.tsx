@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,8 +20,10 @@ export default function RootLayout({
             <head>
                 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet' />
             </head>
-            <body className={`${inter.className} min-h-screen bg-background text-text`}>
-                {children}
+            <body className={`${inter.className} min-h-screen`}>
+                <ThemeProvider>
+                    {children}
+                </ThemeProvider>
             </body>
         </html>
     );

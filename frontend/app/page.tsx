@@ -8,6 +8,7 @@ import {
     ArrowRight, Calendar, Brain, TrendingUp, CheckCircle, XCircle,
     User, BookOpen, Upload, MapPin, Clock, BarChart3, Target
 } from "lucide-react";
+import Footer from "@/components/Footer";
 
 export default function Home() {
     const router = useRouter();

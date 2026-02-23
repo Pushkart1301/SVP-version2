@@ -78,28 +78,28 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
     return (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4 animate-fade-in">
             <div className="absolute inset-0" onClick={onClose}></div>
-            <Card className="w-full max-w-md bg-white relative max-h-[90vh] overflow-y-auto">
-                <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-bold text-slate-900">Edit Profile</h3>
-                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600 p-1 hover:bg-slate-100 rounded-full transition-colors">
+            <Card className="w-full max-w-md bg-white dark:bg-slate-900 relative max-h-[90vh] overflow-y-auto pt-6">
+                <div className="flex items-center justify-between mb-6 px-6">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Edit Profile</h3>
+                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
                         <X size={20} />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    {error && <p className="text-red-500 text-sm bg-red-50 p-2 rounded">{error}</p>}
+                <form onSubmit={handleSubmit} className="space-y-4 px-6 pb-6">
+                    {error && <p className="text-red-500 text-sm bg-red-50 dark:bg-red-900/20 p-2 rounded">{error}</p>}
 
                     {/* Profile Image Section */}
-                    <div className="flex flex-col items-center gap-3 pb-4 border-b">
-                        <div className="relative w-24 h-24 rounded-full bg-slate-100 overflow-hidden border-2 border-slate-200">
+                    <div className="flex flex-col items-center gap-3 pb-4 border-b dark:border-slate-700">
+                        <div className="relative w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden border-2 border-slate-200 dark:border-slate-700">
                             {formData.profile_image ? (
                                 <img src={formData.profile_image} alt="Profile" className="w-full h-full object-cover" />
                             ) : (
-                                <UserCircle className="w-full h-full text-slate-300 p-2" />
+                                <UserCircle className="w-full h-full text-slate-300 dark:text-slate-600 p-2" />
                             )}
                         </div>
                         <div className="flex gap-2">
-                            <label className="cursor-pointer bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors flex items-center gap-1">
+                            <label className="cursor-pointer bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors flex items-center gap-1">
                                 <Upload size={14} /> Upload Photo
                                 <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                             </label>
@@ -107,17 +107,17 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
                                 <button
                                     type="button"
                                     onClick={handleRemoveImage}
-                                    className="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-red-100 transition-colors flex items-center gap-1"
+                                    className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors flex items-center gap-1"
                                 >
                                     <Trash2 size={14} /> Remove
                                 </button>
                             )}
                         </div>
-                        <p className="text-xs text-slate-400">Max size: 2MB</p>
+                        <p className="text-xs text-slate-400 dark:text-slate-500">Max size: 2MB</p>
                     </div>
 
                     <div>
-                        <label className="text-sm font-medium text-slate-700 block mb-1.5">Full Name</label>
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5">Full Name</label>
                         <Input
                             value={formData.full_name}
                             onChange={e => setFormData({ ...formData, full_name: e.target.value })}
@@ -126,7 +126,7 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
                     </div>
 
                     <div>
-                        <label className="text-sm font-medium text-slate-700 block mb-1.5">Email</label>
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5">Email</label>
                         <Input
                             value={formData.email}
                             onChange={e => setFormData({ ...formData, email: e.target.value })}
@@ -137,7 +137,7 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-sm font-medium text-slate-700 block mb-1.5">Branch</label>
+                            <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5">Branch</label>
                             <Input
                                 value={formData.branch}
                                 onChange={e => setFormData({ ...formData, branch: e.target.value })}
@@ -145,7 +145,7 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
                             />
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-slate-700 block mb-1.5">Semester</label>
+                            <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5">Semester</label>
                             <Input
                                 value={formData.semester}
                                 onChange={e => setFormData({ ...formData, semester: e.target.value })}
@@ -155,14 +155,14 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
                     </div>
 
                     <div>
-                        <label className="text-sm font-medium text-slate-700 block mb-1.5">New Password (Optional)</label>
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-1.5">New Password (Optional)</label>
                         <Input
                             value={formData.password}
                             onChange={e => setFormData({ ...formData, password: e.target.value })}
                             placeholder="Leave blank to keep current"
                             type="password"
                         />
-                        <p className="text-xs text-slate-400 mt-1">Only enter if you want to change it.</p>
+                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Only enter if you want to change it.</p>
                     </div>
 
                     <div className="flex gap-3 pt-2">

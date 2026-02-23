@@ -166,7 +166,7 @@ export default function CalendarPage() {
             days.push(
                 <div
                     key={`empty-${i}`}
-                    className="h-20 sm:h-24 border-2 border-slate-200 rounded-lg bg-slate-50/50"
+                    className="h-20 sm:h-24 border-2 border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50/50 dark:bg-slate-800/30"
                 />
             );
         }
@@ -187,20 +187,20 @@ export default function CalendarPage() {
                         h-20 sm:h-24 border-2 rounded-lg p-2 sm:p-3 cursor-pointer 
                         transition-all duration-200 relative
                         ${isSelected
-                            ? 'ring-4 ring-blue-500 ring-opacity-50 bg-blue-50 border-blue-500 shadow-lg transform scale-105'
-                            : 'border-slate-200 hover:border-blue-300 hover:shadow-md'
+                            ? 'ring-4 ring-blue-500 ring-opacity-50 bg-blue-50 dark:bg-blue-900/30 border-blue-500 shadow-lg transform scale-105'
+                            : 'border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md'
                         }
                         ${isToday
-                            ? 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-400'
-                            : 'bg-white hover:bg-slate-50'
+                            ? 'bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-blue-400'
+                            : 'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/50'
                         }
                     `}
                 >
                     <div className="flex justify-between items-start">
                         <span className={`
                             text-sm sm:text-base font-bold
-                            ${isToday ? 'text-blue-600' : 'text-slate-700'}
-                            ${isSelected ? 'text-blue-700' : ''}
+                            ${isToday ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-200'}
+                            ${isSelected ? 'text-blue-700 dark:text-blue-300' : ''}
                         `}>
                             {d}
                         </span>
@@ -231,7 +231,7 @@ export default function CalendarPage() {
                     {/* Today indicator */}
                     {isToday && (
                         <div className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2">
-                            <span className="text-xs font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">
+                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-2 py-0.5 rounded-full">
                                 Today
                             </span>
                         </div>
@@ -269,9 +269,9 @@ export default function CalendarPage() {
     const weekdayName = selectedDate ? WEEKDAY_NAMES[getWeekdayIndex(selectedDate)] : '';
 
     return (
-        <div className="space-y-4 px-4 sm:px-6 ">
+        <div className="space-y-4 max-w-[1400px] mx-auto px-4 py-5">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Attendance Calendar</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Attendance Calendar</h1>
                 <div className="flex flex-col sm:flex-row items-center gap-3">
                     <Button
                         onClick={handleClearAttendance}
@@ -282,21 +282,21 @@ export default function CalendarPage() {
                         <X size={16} />
                         {loading ? "Clearing..." : "Clear All"}
                     </Button>
-                    <div className="flex items-center justify-center gap-3 sm:gap-4 bg-white rounded-xl p-2 shadow-sm border border-slate-200">
+                    <div className="flex items-center justify-center gap-3 sm:gap-4 bg-white dark:bg-slate-800 rounded-xl p-2 shadow-sm border border-slate-200 dark:border-slate-700">
                         <Button
                             onClick={() => changeMonth(-1)}
                             variant="ghost"
-                            className="hover:bg-blue-50 hover:text-blue-600"
+                            className="hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 text-slate-600 dark:text-slate-300"
                         >
                             <ChevronLeft />
                         </Button>
-                        <span className="text-lg sm:text-xl font-semibold text-slate-900 min-w-[150px] sm:min-w-[180px] text-center">
+                        <span className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white min-w-[150px] sm:min-w-[180px] text-center">
                             {currentDate.toLocaleDateString('default', { month: 'long', year: 'numeric' })}
                         </span>
                         <Button
                             onClick={() => changeMonth(1)}
                             variant="ghost"
-                            className="hover:bg-blue-50 hover:text-blue-600"
+                            className="hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 text-slate-600 dark:text-slate-300"
                         >
                             <ChevronRight />
                         </Button>
@@ -305,13 +305,13 @@ export default function CalendarPage() {
             </div>
 
             {/* Calendar Grid */}
-            <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg border border-slate-200 overflow-hidden">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
                 {/* Day headers */}
                 <div className="grid grid-cols-7 gap-2 sm:gap-3 mb-3">
                     {DAYS.map(d => (
                         <div
                             key={d}
-                            className="text-center font-bold text-slate-600 py-2 text-xs sm:text-sm uppercase tracking-wide"
+                            className="text-center font-bold text-slate-600 dark:text-slate-400 py-2 text-xs sm:text-sm uppercase tracking-wide"
                         >
                             {d}
                         </div>

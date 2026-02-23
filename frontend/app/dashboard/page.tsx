@@ -2,9 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Calendar, BookOpen, Upload, MapPin, User, Edit, TrendingUp, CheckCircle, XCircle, Clock10Icon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Calendar, BookOpen, MapPin, TrendingUp, Clock10Icon, ArrowRight } from "lucide-react";
 import FeatureCard from "@/components/FeatureCard";
+import { WelcomeSection } from "@/components/WelcomeSection";
+import { StatsCards } from "@/components/StatsCards";
 import api from "@/lib/api";
 import EditProfileModal from "@/components/EditProfileModal";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
@@ -55,33 +56,29 @@ const Dashboard = () => {
         {
             icon: Calendar,
             title: "Attendance Tracker",
-            description: "Track your daily attendance and monitor progress towards your goals.",
-            emoji: "📅",
-            gradient: "gradient-blue",
+            description: "Mark lecture-wise attendance and monitor progress in real time.",
+            actionLabel: "Open Tracker",
             path: "/dashboard/calendar"
         },
         {
             icon: Clock10Icon,
             title: "Map Subjects to Schedule",
-            description: "Map your subjects to weekdays and create your semester timetable.",
-            emoji: "⏳",
-            gradient: "gradient-cyan",
+            description: "Map subjects to weekdays and build your personalized timetable.",
+            actionLabel: "Get Started",
             path: "/dashboard/schedule"
         },
         {
             icon: BookOpen,
             title: "Select Subjects",
-            description: "Configure your subjects and lecture schedules for accurate tracking.",
-            emoji: "📚",
-            gradient: "gradient-green",
+            description: "Configure subjects for accurate attendance tracking and analytics.",
+            actionLabel: "Configure Now",
             path: "/dashboard/subjects"
         },
         {
             icon: MapPin,
             title: "Plan My Vacation",
-            description: "Get AI-powered vacation recommendations based on your attendance.",
-            emoji: "🌴",
-            gradient: "gradient-pink",
+            description: "Get AI-powered vacation recommendations based on your attendance patterns.",
+            actionLabel: "Plan Vacation",
             path: "/dashboard/planner"
         }
     ];
@@ -111,64 +108,28 @@ const Dashboard = () => {
     };
 
     if (loading) {
-        return <div className="min-h-screen flex items-center justify-center bg-slate-50">Loading...</div>;
+        return <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">Loading...</div>;
     }
 
     return (
-        <div className="min-h-screen bg-slate-50">
-            <div className="pt-8 pb-12">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+            <div className="py-5">
+                <div className="max-w-[1400px] mx-auto px-4 space-y-4">
                     {/* Welcome Section */}
-                    <div className="text-center mb-12 animate-fade-in">
-                        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-                            Welcome back, <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">{user?.full_name?.split(' ')[0] || "Student"}!</span>
-                        </h1>
-                        <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-                            Ready to plan your next vacation? Let's check your attendance progress and find the perfect time to take a break.
-                        </p>
-                    </div>
-
-                    {/* Profile Welcome Card */}
-                    <div className="welcome-card mb-12 animate-fade-in bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
-                            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shrink-0 overflow-hidden">
-                                {user?.profile_image ? (
-                                    <img src={user.profile_image} alt={user.full_name} className="w-full h-full object-cover" />
-                                ) : (
-                                    <User className="w-10 h-10 text-white" />
-                                )}
-                            </div>
-                            <div className="flex-1 text-center md:text-left w-full">
-                                <h3 className="text-2xl font-semibold text-slate-900">{user?.full_name || "Student Name"}</h3>
-                                <p className="text-slate-500 mb-4 md:mb-2">
-                                    {(user?.semester && user?.branch)
-                                        ? `Semester ${user.semester} - ${user.branch}`
-                                        : "Set your Semester & Branch"}
-                                </p>
-                                <div className="flex items-center space-x-4">
-                                    <div className="flex-1">
-                                        <div className="flex justify-between text-sm text-slate-600 mb-2">
-                                            <span>Attendance Goal Progress</span>
-                                            <span>{stats?.overall_percentage || 0}% / 75%</span>
-                                        </div>
-                                        <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-                                            <div
-                                                className="bg-gradient-to-r from-green-500 to-emerald-500 h-full rounded-full transition-all duration-1000 ease-out"
-                                                style={{ width: `${stats?.overall_percentage || 0}%` }}
-                                            ></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <Button
-                                onClick={() => setIsEditing(true)}
-                                variant="outline"
-                                className="hover:bg-slate-50 border-slate-200 text-slate-700"
-                            >
-                                <Edit className="w-4 h-4 mr-2" />
-                                Edit Profile
-                            </Button>
+                    <div className="animate-fade-in">
+                        <div className="mb-5">
+                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                                Welcome back, {user?.full_name || "Student"} 👋
+                            </h1>
+                            <p className="text-base text-gray-500 dark:text-gray-400 mt-1.5">
+                                Track your attendance, stay on target, and plan vacations safely.
+                            </p>
                         </div>
+                        <WelcomeSection
+                            user={user}
+                            stats={stats}
+                            onEditProfile={() => setIsEditing(true)}
+                        />
                     </div>
 
                     {/* Edit Modal */}
@@ -180,159 +141,157 @@ const Dashboard = () => {
                         />
                     )}
 
-                    {/* Feature Cards Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mb-12">
-                        {featureCards.map((card, index) => (
-                            <div
-                                key={card.title}
-                                className="animate-fade-in"
-                                style={{ animationDelay: `${index * 0.1}s` }}
-                            >
-                                <FeatureCard
-                                    icon={card.icon}
-                                    title={card.title}
-                                    description={card.description}
-                                    emoji={card.emoji}
-                                    gradient={card.gradient}
-                                    onClick={() => router.push(card.path)}
-                                />
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Status Overview */}
-                    <div className="status-card animate-fade-in bg-white rounded-3xl p-8 border border-slate-100 shadow-sm" style={{ animationDelay: '0.5s' }}>
-                        <div className="flex items-center justify-between mb-8">
-                            <h3 className="text-2xl font-bold text-slate-900">Attendance Overview</h3>
-                            <div className="p-2 bg-green-50 rounded-lg">
-                                <TrendingUp className="w-6 h-6 text-green-600" />
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <div className="text-center p-6 bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg transition-shadow duration-300">
-                                <div className="p-3 bg-green-50 rounded-full w-fit mx-auto mb-4">
-                                    <CheckCircle className="w-8 h-8 text-green-500" />
-                                </div>
-                                <div className="text-4xl font-bold text-slate-900 mb-1">{stats?.lectures_attended || 0}</div>
-                                <div className="text-sm font-medium text-slate-500 uppercase tracking-wide">Lectures Attended</div>
-                            </div>
-
-                            <div className="text-center p-6 bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg transition-shadow duration-300">
-                                <div className="p-3 bg-red-50 rounded-full w-fit mx-auto mb-4">
-                                    <XCircle className="w-8 h-8 text-red-500" />
-                                </div>
-                                <div className="text-4xl font-bold text-slate-900 mb-1">{stats?.lectures_missed || 0}</div>
-                                <div className="text-sm font-medium text-slate-500 uppercase tracking-wide">Lectures Missed</div>
-                            </div>
-
-                            <div className="text-center p-6 bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg transition-shadow duration-300">
-                                <div className="p-3 bg-purple-50 rounded-full w-fit mx-auto mb-4">
-                                    <Calendar className="w-8 h-8 text-purple-500" />
-                                </div>
-                                <div className="text-4xl font-bold text-slate-900 mb-1">{stats ? stats.lectures_attended + stats.lectures_missed : 0}</div>
-                                <div className="text-sm font-medium text-slate-500 uppercase tracking-wide">Total Marked</div>
-                            </div>
-
-                            <div className="text-center p-6 bg-white rounded-2xl border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg transition-shadow duration-300">
-                                <div className="p-3 bg-blue-50 rounded-full w-fit mx-auto mb-4">
-                                    <TrendingUp className="w-8 h-8 text-blue-500" />
-                                </div>
-                                <div className="text-4xl font-bold text-slate-900 mb-1">{stats?.overall_percentage || 0}%</div>
-                                <div className="text-sm font-medium text-slate-500 uppercase tracking-wide">Overall Percentage</div>
-                            </div>
-                        </div>
-
-                        {/* Attendance Tracking Graph */}
-                        <div className="mt-8 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-                            <h4 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                                <TrendingUp className="w-5 h-5 text-blue-600" />
-                                Attendance Tracking (Last 30 Days)
-                            </h4>
-                            <ResponsiveContainer width="100%" height={300}>
-                                <LineChart data={generateAttendanceGraphData(stats)}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                    <XAxis
-                                        dataKey="week"
-                                        stroke="#94a3b8"
-                                        style={{ fontSize: '12px' }}
-                                    />
-                                    <YAxis
-                                        stroke="#94a3b8"
-                                        style={{ fontSize: '12px' }}
-                                        domain={[0, 100]}
-                                        label={{ value: 'Attendance %', angle: -90, position: 'insideLeft', style: { fontSize: '12px', fill: '#64748b' } }}
-                                    />
-                                    <Tooltip
-                                        contentStyle={{
-                                            backgroundColor: 'white',
-                                            border: '1px solid #e2e8f0',
-                                            borderRadius: '8px',
-                                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                                        }}
-                                    />
-                                    <Legend />
-                                    <Line
-                                        type="monotone"
-                                        dataKey="percentage"
-                                        stroke="#3b82f6"
-                                        strokeWidth={3}
-                                        dot={{ fill: '#3b82f6', r: 5 }}
-                                        activeDot={{ r: 7 }}
-                                        name="Attendance %"
-                                    />
-                                    <Line
-                                        type="monotone"
-                                        dataKey="target"
-                                        stroke="#10b981"
-                                        strokeWidth={2}
-                                        strokeDasharray="5 5"
-                                        dot={false}
-                                        name="Target (75%)"
-                                    />
-                                </LineChart>
-                            </ResponsiveContainer>
-                            <p className="text-xs text-slate-500 mt-4 text-center">
-                                Track your attendance trends to identify patterns and plan better
-                            </p>
-                        </div>
-
+                    {/* Action Required / On Track Banner */}
+                    <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
                         {stats ? (
-                            <div className={`mt-8 p-6 rounded-2xl border ${stats.overall_percentage >= 75
-                                ? "bg-gradient-to-r from-green-50 to-emerald-50 border-green-100"
-                                : "bg-gradient-to-r from-red-50 to-orange-50 border-red-100"
+                            <div className={`flex flex-col sm:flex-row sm:items-center gap-4 p-5 rounded-2xl border ${stats.overall_percentage >= 75
+                                ? "bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800"
+                                : "bg-[#FFF8EB] dark:bg-amber-900/20 border-amber-200 dark:border-amber-800"
                                 }`}>
-                                <h4 className={`flex items-center gap-2 font-bold mb-2 ${stats.overall_percentage >= 75 ? "text-green-900" : "text-red-900"
-                                    }`}>
-                                    <span>{stats.overall_percentage >= 75 ? "🎉" : "⚠️"}</span>
-                                    {stats.overall_percentage >= 75 ? "On Track!" : "Action Required"}
-                                </h4>
-                                <p className={`leading-relaxed mb-3 ${stats.overall_percentage >= 75 ? "text-green-700" : "text-red-700"
-                                    }`}>
-                                    {stats.overall_percentage >= 75
-                                        ? "Great job! You are maintaining a healthy attendance record. You are in a good position to plan your next vacation!"
-                                        : "Your attendance is below the 75% threshold. You need to attend more classes to avoid detention. Check the planner for catch-up suggestions."}
-                                </p>
-                                <div className={`text-sm mt-4 pt-4 border-t ${stats.overall_percentage >= 75 ? "border-green-200 text-green-800" : "border-red-200 text-red-800"}`}>
-                                    <p className="font-medium">
-                                        📊 <strong>Tracked Attendance:</strong> You've marked {stats.lectures_attended + stats.lectures_missed} out of your total lectures
-                                        ({stats.lectures_attended} attended, {stats.lectures_missed} missed)
-                                    </p>
-                                    <p className="text-xs mt-2 opacity-75">
-                                        💡 Tip: Mark attendance daily to track your actual bunking habits and plan better!
-                                    </p>
+                                <div className="flex items-start gap-3 flex-1">
+                                    <div className={`mt-0.5 p-2 rounded-xl shrink-0 ${stats.overall_percentage >= 75 ? "bg-green-100 dark:bg-green-800" : "bg-amber-100 dark:bg-amber-800"}`}>
+                                        <span className="text-lg">{stats.overall_percentage >= 75 ? "🎉" : "⚠️"}</span>
+                                    </div>
+                                    <div className="min-w-0">
+                                        <h4 className={`font-bold flex items-center gap-2 ${stats.overall_percentage >= 75 ? "text-green-900 dark:text-green-100" : "text-gray-900 dark:text-gray-100"}`}>
+                                            {stats.overall_percentage >= 75 ? "On Track!" : "Action Required"}
+                                            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">✦ AI</span>
+                                        </h4>
+                                        <p className={`text-sm mt-1 ${stats.overall_percentage >= 75 ? "text-green-700 dark:text-green-300" : "text-gray-600 dark:text-gray-300"}`}>
+                                            {stats.overall_percentage >= 75
+                                                ? "Great job! You're maintaining a healthy attendance record. You can safely plan a vacation!"
+                                                : <>Your attendance is below the target. Attend the next <strong>{Math.ceil((75 - stats.overall_percentage) / 2)} lectures</strong> to safely plan a vacation without falling below minimum requirements.</>}
+                                        </p>
+                                        {stats.overall_percentage < 75 && (
+                                            <div className="flex items-center gap-4 mt-2.5 text-xs text-gray-500 dark:text-gray-400">
+                                                <span className="flex items-center gap-1.5">
+                                                    <span className="inline-block w-2 h-2 rounded-sm bg-blue-500"></span>
+                                                    Prediction: {Math.min(100, stats.overall_percentage + Math.ceil((75 - stats.overall_percentage) / 2) * 0.5).toFixed(1)}% after {Math.ceil((75 - stats.overall_percentage) / 2)} lectures
+                                                </span>
+                                                <span className="flex items-center gap-1.5">
+                                                    <span className="inline-block w-2 h-2 rounded-sm bg-green-500"></span>
+                                                    Buffer: {Math.max(1, Math.ceil((75 - stats.overall_percentage) / 3))} lectures
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
+                                <button
+                                    onClick={() => router.push('/dashboard/planner')}
+                                    className="shrink-0 self-center flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 dark:bg-blue-700 text-white text-sm font-medium hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors shadow-sm"
+                                >
+                                    <span>✦</span> View AI Suggestions
+                                </button>
                             </div>
                         ) : (
-                            <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100">
-                                <h4 className="flex items-center gap-2 font-bold text-blue-900 mb-2">
+                            <div className="p-5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl border border-blue-200 dark:border-blue-800">
+                                <h4 className="flex items-center gap-2 font-bold text-blue-900 dark:text-blue-100 mb-1">
                                     <span>🎯</span> Getting Started
                                 </h4>
-                                <p className="text-blue-700 leading-relaxed">
-                                    Start tracking your attendance by uploading your academic calendar and selecting your subjects to get personalized insights.
+                                <p className="text-sm text-blue-700 dark:text-blue-300">
+                                    Start tracking your attendance by uploading your academic calendar and selecting your subjects.
                                 </p>
                             </div>
                         )}
+                    </div>
+
+                    {/* Attendance Tracking Graph & Your Tools Side by Side */}
+                    <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                            {/* Attendance Graph - Takes 2 columns on large screens */}
+                            <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm transition-colors">
+                                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                    <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                                    Attendance Tracking (Last 30 Days)
+                                </h4>
+                                <ResponsiveContainer width="100%" height={280}>
+                                    <LineChart data={generateAttendanceGraphData(stats)}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" className="dark:stroke-gray-700" />
+                                        <XAxis
+                                            dataKey="week"
+                                            stroke="#94a3b8"
+                                            style={{ fontSize: '12px' }}
+                                        />
+                                        <YAxis
+                                            stroke="#94a3b8"
+                                            style={{ fontSize: '12px' }}
+                                            domain={[0, 100]}
+                                            label={{ value: 'Attendance %', angle: -90, position: 'insideLeft', style: { fontSize: '12px', fill: '#64748b' } }}
+                                        />
+                                        <Tooltip
+                                            contentStyle={{
+                                                backgroundColor: 'white',
+                                                border: '1px solid #e2e8f0',
+                                                borderRadius: '8px',
+                                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                                            }}
+                                        />
+                                        <Legend />
+                                        <Line
+                                            type="monotone"
+                                            dataKey="percentage"
+                                            stroke="#3b82f6"
+                                            strokeWidth={3}
+                                            dot={{ fill: '#3b82f6', r: 5 }}
+                                            activeDot={{ r: 7 }}
+                                            name="Attendance %"
+                                        />
+                                        <Line
+                                            type="monotone"
+                                            dataKey="target"
+                                            stroke="#10b981"
+                                            strokeWidth={2}
+                                            strokeDasharray="5 5"
+                                            dot={false}
+                                            name="Target (75%)"
+                                        />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
+                                    Track your attendance trends to identify patterns and plan better
+                                </p>
+                            </div>
+
+                            {/* Your Tools - Takes 1 column on large screens */}
+                            <div className="lg:col-span-1 bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col transition-colors">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                    <span className="text-blue-600 dark:text-blue-400">⚡</span>
+                                    Your Tools
+                                </h3>
+                                <div className="flex flex-col gap-2.5 flex-1">
+                                    {featureCards.map((card) => (
+                                        <div
+                                            key={card.title}
+                                            onClick={() => router.push(card.path)}
+                                            className="group flex items-start gap-3 p-3 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition-all duration-200 cursor-pointer bg-gray-50 dark:bg-gray-900 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                                        >
+                                            {/* Icon */}
+                                            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 group-hover:border-blue-400 dark:group-hover:border-blue-500 group-hover:bg-blue-500 dark:group-hover:bg-blue-600 transition-colors">
+                                                <card.icon className="w-4 h-4 text-gray-600 dark:text-gray-300 group-hover:text-white transition-colors" />
+                                            </div>
+
+                                            {/* Content */}
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors mb-0.5">
+                                                    {card.title}
+                                                </h4>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-2 leading-relaxed transition-colors">
+                                                    {card.description}
+                                                </p>
+                                            </div>
+
+                                            {/* Arrow */}
+                                            <ArrowRight className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Stats Cards */}
+                    <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                        <StatsCards stats={stats} />
                     </div>
                 </div>
             </div>
