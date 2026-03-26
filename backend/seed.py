@@ -7,14 +7,14 @@ from passlib.context import CryptContext
 
 load_dotenv()
 
-MONGODB_URL = os.getenv("MONGODB_URL")
-if not MONGODB_URL:
-    MONGODB_URL = "mongodb+srv://user_1301:HpSnMiizEaZzMrzD@cluster0.p4qcl64.mongodb.net/svp_db?retryWrites=true&w=majority"
+MONGO_URI = os.getenv("DATABASE_URL")
+if not MONGO_URI:
+    raise ValueError("DATABASE_URL is not set in the environment.")
 
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
 async def seed():
-    client = AsyncIOMotorClient(MONGODB_URL)
+    client = AsyncIOMotorClient(MONGO_URI)
     db = client["svp_db"]
     
     email = "1032230410@tcetmumbai.in"

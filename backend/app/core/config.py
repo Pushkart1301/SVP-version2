@@ -1,5 +1,9 @@
 from pydantic_settings import BaseSettings
 from typing import Optional
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+ENV_PATH = BASE_DIR / ".env"
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Student Vacation Planner 2.0"
@@ -18,6 +22,6 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str
 
     class Config:
-        env_file = ".env"
+        env_file = str(ENV_PATH)
 
 settings = Settings()

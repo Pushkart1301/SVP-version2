@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, User, MessageSquare, Send, CheckCircle, AlertCircle } from "lucide-react";
+import { Mail, User, MessageSquare, Send, CheckCircle, AlertCircle, Sparkles, Clock3, ShieldCheck } from "lucide-react";
 import { Button, Card } from "@/components/ui";
 
 export default function ContactPage() {
@@ -9,18 +9,17 @@ export default function ContactPage() {
         name: "",
         email: "",
         subject: "",
-        message: ""
+        message: "",
     });
     const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
     const [errorMessage, setErrorMessage] = useState("");
 
-    // Replace 'YOUR_FORMSPREE_ID' with your actual Formspree form ID
     const FORMSPREE_ENDPOINT = "https://formspree.io/f/xqezbvve";
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [e.target.name]: e.target.value,
         });
     };
 
@@ -33,16 +32,14 @@ export default function ContactPage() {
             const response = await fetch(FORMSPREE_ENDPOINT, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(formData),
             });
 
             if (response.ok) {
                 setStatus("success");
                 setFormData({ name: "", email: "", subject: "", message: "" });
-
-                // Reset success message after 5 seconds
                 setTimeout(() => setStatus("idle"), 5000);
             } else {
                 throw new Error("Failed to send message");
@@ -54,119 +51,133 @@ export default function ContactPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-950 dark:to-slate-900 py-8 px-4 sm:py-12 transition-colors">
-            <div className="max-w-6xl mx-auto">
-                {/* Header */}
-                <div className="text-center mb-8 sm:mb-12 animate-fade-in">
-                    <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 mb-4 sm:mb-6 shadow-lg">
-                        <Mail className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 px-4 py-8 transition-colors dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 sm:py-12">
+            <div className="mx-auto max-w-6xl space-y-8">
+                <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800 md:p-8">
+                    <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+                        <div>
+                            <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                                <Sparkles className="h-3.5 w-3.5" />
+                                Contact Hub
+                            </div>
+                            <h1 className="mt-5 text-4xl font-black tracking-tight text-slate-900 dark:text-white md:text-5xl">
+                                Get in touch with the SVP team.
+                            </h1>
+                            <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300 md:text-lg">
+                                Have a question, spotted an issue, or want to share feedback? Send us a message and we’ll get back to you as soon as possible.
+                            </p>
+                            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                                <HeroPill icon={Mail} title="Direct Email" subtitle="Reach us anytime" />
+                                <HeroPill icon={Clock3} title="Quick Replies" subtitle="Usually within 24-48h" />
+                                <HeroPill icon={ShieldCheck} title="Support Ready" subtitle="Helpful for account issues" />
+                            </div>
+                        </div>
+
+                        <div className="rounded-[28px] border border-slate-200 bg-[linear-gradient(135deg,rgba(59,130,246,0.10),rgba(99,102,241,0.08))] p-6 dark:border-slate-700 dark:bg-[linear-gradient(135deg,rgba(59,130,246,0.14),rgba(99,102,241,0.10))]">
+                            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/20">
+                                <Mail className="h-10 w-10" />
+                            </div>
+                            <h2 className="mt-5 text-center text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+                                We’d love to hear from you
+                            </h2>
+                            <p className="mt-3 text-center text-sm leading-6 text-slate-600 dark:text-slate-300">
+                                Include clear details so we can help faster, especially for timetable, attendance, or account-related issues.
+                            </p>
+                        </div>
                     </div>
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-3 sm:mb-4">
-                        Get in <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Touch</span>
-                    </h1>
-                    <p className="text-base sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto px-4">
-                        Have questions or feedback? We'd love to hear from you! Send us a message and we'll respond as soon as possible.
-                    </p>
-                </div>
+                </section>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-                    {/* Contact Info Cards */}
-                    <div className="lg:col-span-1 space-y-4">
-                        <Card className="p-4 sm:p-6 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:shadow-lg transition-all duration-300">
-                            <div className="flex items-start gap-3 sm:gap-4">
-                                <div className="p-2.5 sm:p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex-shrink-0">
-                                    <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+                    <div className="space-y-4">
+                        <Card className="rounded-3xl border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+                            <div className="flex items-start gap-4">
+                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                                    <Mail className="h-6 w-6" />
                                 </div>
-                                <div className="min-w-0 flex-1">
-                                    <h3 className="font-bold text-slate-900 dark:text-white mb-1 text-sm sm:text-base">Email</h3>
-                                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 break-all">toshniwal.pushkarx@gmail.com</p>
+                                <div className="min-w-0">
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">Email</h3>
+                                    <p className="mt-2 break-all text-sm leading-6 text-slate-600 dark:text-slate-400">
+                                        toshniwal.pushkarx@gmail.com
+                                    </p>
                                 </div>
                             </div>
                         </Card>
 
-                        <Card className="p-4 sm:p-6 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:shadow-lg transition-all duration-300">
-                            <div className="flex items-start gap-3 sm:gap-4">
-                                <div className="p-2.5 sm:p-3 bg-green-50 dark:bg-green-900/30 rounded-lg flex-shrink-0">
-                                    <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" />
+                        <Card className="rounded-3xl border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+                            <div className="flex items-start gap-4">
+                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                                    <MessageSquare className="h-6 w-6" />
                                 </div>
-                                <div className="min-w-0 flex-1">
-                                    <h3 className="font-bold text-slate-900 dark:text-white mb-1 text-sm sm:text-base">Response Time</h3>
-                                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Within 24-48 hours</p>
+                                <div>
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">Response Time</h3>
+                                    <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                                        Within 24-48 hours for most messages.
+                                    </p>
                                 </div>
                             </div>
                         </Card>
 
-                        <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800/30">
-                            <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-sm sm:text-base">💡 Quick Tip</h3>
-                            <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                                Include your student ID or registered email for faster assistance with account-related queries.
+                        <Card className="rounded-3xl border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 shadow-sm dark:border-blue-800/40 dark:from-blue-900/20 dark:to-indigo-900/20">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Quick tip</h3>
+                            <p className="mt-3 text-sm leading-6 text-slate-700 dark:text-slate-300">
+                                Include your student ID or registered email for faster help with account-related queries.
                             </p>
                         </Card>
                     </div>
 
-                    {/* Contact Form */}
-                    <Card className="lg:col-span-2 p-6 sm:p-8 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-xl">
-                        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-4 sm:mb-6">Send us a Message</h2>
+                    <Card className="rounded-3xl border-slate-200 bg-white p-6 shadow-xl dark:border-slate-700 dark:bg-slate-800 sm:p-8">
+                        <div className="mb-6">
+                            <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Send us a message</h2>
+                            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                                Your existing submission flow stays exactly the same. Only the UI has been refreshed.
+                            </p>
+                        </div>
 
                         {status === "success" && (
-                            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 rounded-lg flex items-start gap-2 sm:gap-3 animate-fade-in">
-                                <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-500 flex-shrink-0 mt-0.5" />
-                                <p className="text-sm sm:text-base text-green-800 dark:text-green-300 font-medium">
+                            <div className="mb-6 flex items-start gap-3 rounded-2xl border border-green-200 bg-green-50 p-4 animate-fade-in dark:border-green-800/50 dark:bg-green-900/20">
+                                <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-500" />
+                                <p className="text-sm font-medium text-green-800 dark:text-green-300">
                                     Message sent successfully! We'll get back to you soon.
                                 </p>
                             </div>
                         )}
 
                         {status === "error" && (
-                            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-lg flex items-start gap-2 sm:gap-3 animate-fade-in">
-                                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-500 flex-shrink-0 mt-0.5" />
-                                <p className="text-sm sm:text-base text-red-800 dark:text-red-300 font-medium break-words">{errorMessage}</p>
+                            <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 animate-fade-in dark:border-red-800/50 dark:bg-red-900/20">
+                                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-500" />
+                                <p className="break-words text-sm font-medium text-red-800 dark:text-red-300">{errorMessage}</p>
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                        Your Name *
-                                    </label>
-                                    <div className="relative">
-                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400 dark:text-slate-500" />
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            value={formData.name}
-                                            onChange={handleChange}
-                                            required
-                                            placeholder="John Doe"
-                                            className="w-full pl-10 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                                        />
-                                    </div>
-                                </div>
+                        <form onSubmit={handleSubmit} className="space-y-5">
+                            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                                <Field label="Your Name *" icon={<User className="h-5 w-5" />}>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder="John Doe"
+                                        className="w-full rounded-xl border border-slate-300 bg-white py-3 pl-11 pr-4 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500"
+                                    />
+                                </Field>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                        Email Address *
-                                    </label>
-                                    <div className="relative">
-                                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400 dark:text-slate-500" />
-                                        <input
-                                            type="email"
-                                            name="email"
-                                            value={formData.email}
-                                            onChange={handleChange}
-                                            required
-                                            placeholder="john@example.com"
-                                            className="w-full pl-10 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                                        />
-                                    </div>
-                                </div>
+                                <Field label="Email Address *" icon={<Mail className="h-5 w-5" />}>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder="john@example.com"
+                                        className="w-full rounded-xl border border-slate-300 bg-white py-3 pl-11 pr-4 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500"
+                                    />
+                                </Field>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                    Subject *
-                                </label>
+                                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Subject *</label>
                                 <input
                                     type="text"
                                     name="subject"
@@ -174,14 +185,12 @@ export default function ContactPage() {
                                     onChange={handleChange}
                                     required
                                     placeholder="What is this regarding?"
-                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                    Message *
-                                </label>
+                                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Message *</label>
                                 <textarea
                                     name="message"
                                     value={formData.message}
@@ -189,30 +198,60 @@ export default function ContactPage() {
                                     required
                                     rows={6}
                                     placeholder="Tell us more about your query..."
-                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
+                                    className="w-full resize-none rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500"
                                 />
                             </div>
 
                             <Button
                                 type="submit"
                                 disabled={status === "loading"}
-                                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 sm:py-6 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+                                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-base font-semibold text-white shadow-lg transition-all duration-300 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl"
                             >
                                 {status === "loading" ? (
                                     <>
-                                        <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                        <span className="text-sm sm:text-base">Sending...</span>
+                                        <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                        <span>Sending...</span>
                                     </>
                                 ) : (
                                     <>
-                                        <Send className="w-4 h-4 sm:w-5 sm:h-5" />
-                                        <span className="text-sm sm:text-base">Send Message</span>
+                                        <Send className="h-5 w-5" />
+                                        <span>Send Message</span>
                                     </>
                                 )}
                             </Button>
                         </form>
                     </Card>
                 </div>
+            </div>
+        </div>
+    );
+}
+
+function HeroPill({ icon: Icon, title, subtitle }: any) {
+    return (
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/60">
+            <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-700 shadow-sm dark:bg-slate-800 dark:text-slate-200">
+                    <Icon className="h-5 w-5" />
+                </div>
+                <div>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{title}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{subtitle}</p>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function Field({ label, icon, children }: { label: string; icon: React.ReactNode; children: React.ReactNode }) {
+    return (
+        <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">{label}</label>
+            <div className="relative">
+                <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">
+                    {icon}
+                </div>
+                {children}
             </div>
         </div>
     );

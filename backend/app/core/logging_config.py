@@ -2,6 +2,9 @@ import logging
 import sys
 from pathlib import Path
 
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+LOG_DIR = BASE_DIR / "logs"
+
 def setup_logging(log_level: str = "INFO"):
     """
     Configure application-wide logging.
@@ -11,8 +14,7 @@ def setup_logging(log_level: str = "INFO"):
     """
     
     # Create logs directory if it doesn't exist
-    log_dir = Path("logs")
-    log_dir.mkdir(exist_ok=True)
+    LOG_DIR.mkdir(exist_ok=True)
     
     # Define log format
     log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -22,13 +24,13 @@ def setup_logging(log_level: str = "INFO"):
     console_handler = logging.StreamHandler(sys.stdout)
     
     file_handler = logging.FileHandler(
-        filename=log_dir / "app.log",
+        filename=LOG_DIR / "app.log",
         mode="a",  # append mode
         encoding="utf-8"
     )
     
     error_handler = logging.FileHandler(
-        filename=log_dir / "errors.log",
+        filename=LOG_DIR / "errors.log",
         mode="a",
         encoding="utf-8"
     )

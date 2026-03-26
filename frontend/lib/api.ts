@@ -10,8 +10,10 @@ export async function getVacationPlan(data: any) {
     return res.json();
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1",
+    baseURL: API_URL,
 });
 
 api.interceptors.request.use((config) => {

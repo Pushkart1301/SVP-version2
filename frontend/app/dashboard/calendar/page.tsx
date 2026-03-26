@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { Card, Button } from "@/components/ui";
-import { ChevronLeft, ChevronRight, X, Clock, CheckSquare, Check, Minus, Edit2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Clock, CheckSquare, Check, Minus, Edit2, Sparkles, CalendarDays, ShieldCheck, AlertTriangle } from "lucide-react";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const WEEKDAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -278,61 +278,114 @@ export default function CalendarPage() {
     // Get scheduled subjects when a date is selected
     const scheduledSubjects = selectedDate ? getScheduledSubjects(selectedDate) : [];
     const weekdayName = selectedDate ? WEEKDAY_NAMES[getWeekdayIndex(selectedDate)] : '';
+    const todayKey = getDateKey(new Date());
+    const recordedDays = Object.keys(attendanceMap).length;
+    const attendanceEntries = Object.values(attendanceMap).reduce((count: number, record: any) => count + (record?.entries?.length || 0), 0);
 
     return (
-        <div className="space-y-4 max-w-[1400px] mx-auto px-4 py-5">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Attendance Calendar</h1>
-                <div className="flex flex-col sm:flex-row items-center gap-3">
+        <div className="space-y-6 max-w-[1400px] mx-auto px-4 py-5">
+            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800 md:p-8">
+                <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
+                    <div>
+                        <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                            <Sparkles className="h-3.5 w-3.5" />
+                            Attendance Control
+                        </div>
+                        <div className="mt-4 flex items-start gap-4">
+                            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-600/20">
+                                <CalendarDays className="h-7 w-7" />
+                            </div>
+                            <div>
+                                <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white md:text-4xl">Attendance Calendar</h1>
+                                <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300">
+                                    Review each lecture day, mark subject-wise attendance, and keep the rest of the dashboard aligned with accurate daily records.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                            <TopStat icon={CheckSquare} title="Recorded Days" value={String(recordedDays)} tone="blue" />
+                            <TopStat icon={ShieldCheck} title="Marked Entries" value={String(attendanceEntries)} tone="emerald" />
+                            <TopStat icon={todayKey in attendanceMap ? ShieldCheck : AlertTriangle} title="Today" value={todayKey in attendanceMap ? "Logged" : "Pending"} tone={todayKey in attendanceMap ? "emerald" : "amber"} />
+                        </div>
+                    </div>
+
+                    <Card className="rounded-3xl border-slate-200 bg-slate-50/80 p-5 shadow-none dark:border-slate-700 dark:bg-slate-900/60">
+                        <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
+                            <Sparkles className="h-4 w-4" />
+                            <span className="text-xs font-semibold uppercase tracking-[0.2em]">How It Works</span>
+                        </div>
+                        <h3 className="mt-2 text-lg font-bold text-slate-900 dark:text-white">Safe attendance workflow</h3>
+                        <div className="mt-4 space-y-3">
+                            <HelpRow step="01" text="Pick a date from the calendar grid." />
+                            <HelpRow step="02" text="Review all scheduled subjects for that weekday." />
+                            <HelpRow step="03" text="Mark Present or Absent and let the page save it immediately." />
+                        </div>
+                    </Card>
+                </div>
+            </section>
+
+            <div className="grid gap-6">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
                     <Button
                         onClick={handleClearAttendance}
                         disabled={loading}
                         variant="danger"
-                        className="w-full sm:w-auto gap-2 text-sm"
+                        className="w-full sm:w-auto gap-2 rounded-xl text-sm"
                     >
                         <X size={16} />
                         {loading ? "Clearing..." : "Clear All"}
                     </Button>
-                    <div className="flex items-center justify-center gap-3 sm:gap-4 bg-white dark:bg-slate-800 rounded-xl p-2 shadow-sm border border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center justify-center gap-3 sm:gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-2 shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
                         <Button
                             onClick={() => changeMonth(-1)}
                             variant="ghost"
-                            className="hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 text-slate-600 dark:text-slate-300"
+                            className="text-slate-600 hover:bg-blue-50 hover:text-blue-600 dark:text-slate-300 dark:hover:bg-blue-900/30 dark:hover:text-blue-400"
                         >
                             <ChevronLeft />
                         </Button>
-                        <span className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white min-w-[150px] sm:min-w-[180px] text-center">
+                        <span className="min-w-[150px] text-center text-lg font-semibold text-slate-900 dark:text-white sm:min-w-[180px] sm:text-xl">
                             {currentDate.toLocaleDateString('default', { month: 'long', year: 'numeric' })}
                         </span>
                         <Button
                             onClick={() => changeMonth(1)}
                             variant="ghost"
-                            className="hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 text-slate-600 dark:text-slate-300"
+                            className="text-slate-600 hover:bg-blue-50 hover:text-blue-600 dark:text-slate-300 dark:hover:bg-blue-900/30 dark:hover:text-blue-400"
                         >
                             <ChevronRight />
                         </Button>
                     </div>
                 </div>
-            </div>
 
-            {/* Calendar Grid */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-                {/* Day headers */}
-                <div className="grid grid-cols-7 gap-2 sm:gap-3 mb-3">
-                    {DAYS.map(d => (
-                        <div
-                            key={d}
-                            className="text-center font-bold text-slate-600 dark:text-slate-400 py-2 text-xs sm:text-sm uppercase tracking-wide"
-                        >
-                            {d}
+                <Card className="overflow-hidden rounded-3xl border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800 sm:p-7">
+                    <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Month View</h2>
+                            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                Click any day to review or edit attendance for the scheduled lectures.
+                            </p>
                         </div>
-                    ))}
-                </div>
+                        <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 dark:bg-slate-900 dark:text-slate-300">
+                            <CalendarDays className="h-3.5 w-3.5" />
+                            Interactive calendar
+                        </div>
+                    </div>
 
-                {/* Calendar days */}
-                <div className="grid grid-cols-7 gap-2 sm:gap-3">
-                    {renderDays()}
-                </div>
+                    <div className="grid grid-cols-7 gap-3 sm:gap-4 mb-4">
+                        {DAYS.map(d => (
+                            <div
+                                key={d}
+                                className="py-2 text-center text-xs font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 sm:text-sm"
+                            >
+                                {d}
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="grid grid-cols-7 gap-3 sm:gap-4">
+                        {renderDays()}
+                    </div>
+                </Card>
+
             </div>
 
             {selectedDate && (
@@ -347,7 +400,7 @@ export default function CalendarPage() {
                     }}
                 >
                     <Card
-                        className="w-full max-w-[400px] bg-[#111317] border-0 rounded-2xl p-6 max-h-[85vh] overflow-y-auto shadow-2xl"
+                        className="w-full max-w-[560px] overflow-y-auto rounded-3xl border border-slate-200 bg-white p-7 shadow-2xl dark:border-slate-700 dark:bg-slate-900"
                         onClick={(e) => e.stopPropagation()}
                         style={{
                             animation: 'modalSlideIn 0.3s ease-out'
@@ -356,11 +409,11 @@ export default function CalendarPage() {
                         <div className="flex justify-between items-start mb-6">
                             <div className="w-10"></div> {/* Spacer for centering the icon */}
                             <div className="flex flex-col items-center">
-                                <div className="w-12 h-12 bg-[#1A1D24] rounded-xl flex items-center justify-center mb-4">
-                                    <CheckSquare size={24} className="text-white" />
+                                <div className="w-12 h-12 bg-slate-100 dark:bg-[#1A1D24] rounded-xl flex items-center justify-center mb-4">
+                                    <CheckSquare size={24} className="text-slate-800 dark:text-white" />
                                 </div>
-                                <h3 className="text-xl font-bold text-white mb-1">Review Attendance</h3>
-                                <div className="flex items-center gap-2 text-[#8F93A3] text-sm font-medium">
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Review Attendance</h3>
+                                <div className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-[#8F93A3]">
                                     <Clock size={14} />
                                     {selectedDate?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                                 </div>
@@ -368,7 +421,7 @@ export default function CalendarPage() {
                             <button onClick={() => {
                                 setSelectedDate(null);
                                 setIsEditMode(false);
-                            }} className="text-[#8F93A3] hover:text-white w-10 flex justify-end">
+                            }} className="text-slate-400 hover:text-slate-900 dark:text-[#8F93A3] dark:hover:text-white w-10 flex justify-end">
                                 <X size={20} />
                             </button>
                         </div>
@@ -381,34 +434,34 @@ export default function CalendarPage() {
                                     const status = entry?.status;
 
                                     return (
-                                        <div key={`${sub._id}-${sub.slotIndex}`} className="flex items-center justify-between p-4 bg-[#1A1D24] rounded-xl border border-white/5">
+                                        <div key={`${sub._id}-${sub.slotIndex}`} className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-white/5 dark:bg-[#1A1D24]">
                                             <div className="flex-1">
-                                                <div className="font-semibold tracking-wide text-white mb-1">{sub.name}</div>
-                                                <div className="text-xs text-[#8F93A3] flex items-center gap-1 font-medium">
+                                                <div className="mb-1 font-semibold tracking-wide text-slate-800 dark:text-white">{sub.name}</div>
+                                                <div className="flex items-center gap-1 text-xs font-medium text-slate-500 dark:text-[#8F93A3]">
                                                     <Clock size={12} />
                                                     {sub.timeSlot}
                                                 </div>
                                             </div>
                                             <div className="flex gap-2 shrink-0 ml-4">
                                                 {attendanceMap[dateKey] && !isEditMode ? (
-                                                    <div className={`px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2 ${status === 'P' ? 'bg-[#2BE67D] text-[#111317]' : status === 'A' ? 'bg-[#1A1D24] border border-[#2B2F36] text-white' : 'bg-white/10 text-[#8F93A3]'}`}>
+                                                    <div className={`px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2 ${status === 'P' ? 'bg-[#2BE67D] text-[#111317]' : status === 'A' ? 'bg-slate-200 dark:bg-[#1A1D24] border border-slate-300 dark:border-[#2B2F36] text-slate-700 dark:text-white' : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-[#8F93A3]'}`}>
                                                         {status === 'P' && <Check size={16} />}
-                                                        {status === 'A' && <Minus size={16} className="text-[#8F93A3]" />}
+                                                        {status === 'A' && <Minus size={16} className="text-slate-400 dark:text-[#8F93A3]" />}
                                                         {status === 'P' ? 'Present' : status === 'A' ? 'Absent' : '-'}
                                                     </div>
                                                 ) : (
-                                                    <div className="bg-[#111317] rounded-full p-1 border border-white/5 flex">
+                                                    <div className="bg-slate-200 dark:bg-[#111317] rounded-full p-1 border border-slate-300 dark:border-white/5 flex">
                                                         <button
                                                             type="button"
                                                             onClick={() => handleMark(sub._id, "P")}
-                                                            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${status === 'P' ? 'bg-[#2BE67D] text-[#111317]' : 'text-[#8F93A3] hover:text-white'}`}
+                                                            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${status === 'P' ? 'bg-[#2BE67D] text-[#111317] shadow-sm' : 'text-slate-500 dark:text-[#8F93A3] hover:text-slate-900 dark:hover:text-white hover:bg-slate-300 dark:hover:bg-white/5'}`}
                                                         >
                                                             P
                                                         </button>
                                                         <button
                                                             type="button"
                                                             onClick={() => handleMark(sub._id, "A")}
-                                                            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${status === 'A' ? 'bg-[#FF4646] text-white' : 'text-[#8F93A3] hover:text-white'}`}
+                                                            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${status === 'A' ? 'bg-[#FF4646] text-white shadow-sm' : 'text-slate-500 dark:text-[#8F93A3] hover:text-slate-900 dark:hover:text-white hover:bg-slate-300 dark:hover:bg-white/5'}`}
                                                         >
                                                             A
                                                         </button>
@@ -421,7 +474,7 @@ export default function CalendarPage() {
                                 {attendanceMap[getDateKey(selectedDate)] && !isEditMode && (
                                     <button
                                         onClick={() => setIsEditMode(true)}
-                                        className="w-full mt-6 bg-[#2BE67D] hover:bg-[#25C86C] text-[#111317] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"
+                                        className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#2BE67D] py-3.5 font-bold text-[#111317] transition-colors hover:bg-[#25C86C]"
                                     >
                                         <Edit2 size={18} />
                                         Modify Attendance
@@ -430,7 +483,7 @@ export default function CalendarPage() {
                             </div>
                         ) : (
                             <div className="text-center py-12 px-4">
-                                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-slate-700/50 flex items-center justify-center">
+                                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-slate-700/50">
                                     <Clock size={32} className="text-gray-400" />
                                 </div>
                                 <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Lectures Scheduled</h4>
@@ -443,6 +496,39 @@ export default function CalendarPage() {
                     </Card>
                 </div>
             )}
+        </div>
+    );
+}
+
+function TopStat({ icon: Icon, title, value, tone }: { icon: any; title: string; value: string; tone: "blue" | "emerald" | "amber" }) {
+    const tones = {
+        blue: "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+        emerald: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
+        amber: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+    };
+
+    return (
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/60">
+            <div className="flex items-center gap-3">
+                <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${tones[tone]}`}>
+                    <Icon className="h-5 w-5" />
+                </div>
+                <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">{title}</p>
+                    <p className="mt-1 text-lg font-bold text-slate-900 dark:text-white">{value}</p>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function HelpRow({ step, text }: { step: string; text: string }) {
+    return (
+        <div className="flex gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-sm font-black text-white dark:bg-white dark:text-slate-900">
+                {step}
+            </div>
+            <p className="text-sm leading-5 text-slate-600 dark:text-slate-300">{text}</p>
         </div>
     );
 }
