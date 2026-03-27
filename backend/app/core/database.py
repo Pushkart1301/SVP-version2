@@ -11,7 +11,7 @@ class Database:
     def connect(self):
         try:
             self.client = AsyncIOMotorClient(settings.DATABASE_URL)
-            logger.info(f"Connected to MongoDB at {settings.DATABASE_URL}")
+            logger.info(f"DEBUG DATABASE_URL = {settings.DATABASE_URL}")
         except Exception as e:
             logger.error(f"Failed to connect to MongoDB: {str(e)}")
             raise
