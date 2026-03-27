@@ -50,41 +50,38 @@ export default function CalendarPage() {
     useEffect(() => {
         const fetchRefData = async () => {
             // Fetch Subjects
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth() + 1; // 1-12
+
+            const from = `${year}-${String(month).padStart(2, "0")}-01`;
+            const toDate = new Date(year, month, 1); // first day of next month
+            const to = `${toDate.getFullYear()}-${String(toDate.getMonth() + 1).padStart(2, "0")}-01`;
+
             try {
-                const subRes = await api.get("subjects");
+                const [subRes, schedRes, attRes] = await Promise.all([
+                    api.get("subjects"),
+                    api.get("attendance/schedule"),
+                    api.get(`attendance/history?from=${from}&to=${to}`),
+                ]);
+
                 setSubjects(subRes.data);
-            } catch (error) {
-                console.error("Failed to fetch subjects", error);
-            }
-
-            // Fetch Schedule
-            try {
-                const schedRes = await api.get("attendance/schedule");
                 setSchedule(schedRes.data);
-            } catch (error) {
-                console.error("Failed to fetch schedule", error);
-            }
-
-            // Fetch Attendance History
-            try {
-                const attRes = await api.get("attendance/history");
-                console.log("Fetched Attendance:", attRes.data);
 
                 const map: Record<string, any> = {};
                 attRes.data.forEach((record: any) => {
                     let dKey = record.date;
-                    if (typeof dKey === 'string' && dKey.includes('T')) {
-                        dKey = dKey.split('T')[0];
+                    if (typeof dKey === "string" && dKey.includes("T")) {
+                        dKey = dKey.split("T")[0];
                     }
                     map[dKey] = record;
                 });
                 setAttendanceMap(map);
             } catch (error) {
-                console.error("Failed to fetch attendance history", error);
+                console.error("Failed to fetch calendar data", error);
             }
         };
         fetchRefData();
-    }, []);
+    }, [currentDate.getFullYear(), currentDate.getMonth()]);
 
     // Get scheduled subjects for a specific date
     const getScheduledSubjects = (date: Date) => {

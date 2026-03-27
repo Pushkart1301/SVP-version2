@@ -6,6 +6,7 @@ import { LogOut, Bell, Moon, Sun, User, ChevronDown, ChevronUp, Check, CheckCirc
 import clsx from "clsx";
 import { useTheme } from "@/contexts/ThemeContext";
 import EditProfileModal from "@/components/EditProfileModal";
+import api from "@/lib/api";
 
 export default function Navbar() {
     const pathname = usePathname();
@@ -18,12 +19,15 @@ export default function Navbar() {
     // Notifications State
     const [notifications, setNotifications] = useState<any[]>([]);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-    const unreadCount = notifications.filter(n => !n.is_read).length;
+    const unreadCount = React.useMemo(() => notifications.filter(n => !n.is_read).length, [notifications]);
+
+    // Avoid refetching notifications on every open.
+    // If the user opens the dropdown repeatedly within this window, we use cached data.
+    const lastNotificationsFetchRef = React.useRef<number>(0);
+    const NOTIFICATIONS_STALE_MS = 30_000;
 
     const fetchUser = async () => {
         try {
-            // api lib handles token injection
-            const { default: api } = await import("@/lib/api");
             const res = await api.get("auth/me");
             setUser(res.data);
         } catch (error) {
@@ -33,10 +37,10 @@ export default function Navbar() {
 
     const fetchNotifications = async () => {
         try {
-            const { default: api } = await import("@/lib/api");
             const res = await api.get("notifications");
             if (res.data) {
                 setNotifications(res.data);
+                lastNotificationsFetchRef.current = Date.now();
             }
         } catch (error) {
             console.error("Failed to fetch notifications", error);
@@ -45,9 +49,8 @@ export default function Navbar() {
 
     const markAsRead = async (id: string) => {
         try {
-            const { default: api } = await import("@/lib/api");
             await api.put(`/notifications/${id}/read`);
-            setNotifications(notifications.map(n => n._id === id ? { ...n, is_read: true } : n));
+            setNotifications((prev) => prev.map(n => (n._id === id ? { ...n, is_read: true } : n)));
         } catch (error) {
             console.error("Failed to mark notification as read", error);
         }
@@ -55,20 +58,33 @@ export default function Navbar() {
 
     const markAllAsRead = async () => {
         try {
-            const { default: api } = await import("@/lib/api");
             await api.put("notifications/read-all");
-            setNotifications(notifications.map(n => ({ ...n, is_read: true })));
+            setNotifications((prev) => prev.map(n => ({ ...n, is_read: true })));
         } catch (error) {
             console.error("Failed to mark all as read", error);
         }
     };
 
+    // Fetch user once per session/navigation to reduce network chatter.
     React.useEffect(() => {
-        if (!pathname.includes("/auth")) {
-            fetchUser();
+        if (pathname.includes("/auth")) return;
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        fetchUser();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Fetch notifications only when the dropdown opens (and only if data is stale).
+    React.useEffect(() => {
+        if (!isNotificationsOpen) return;
+
+        const now = Date.now();
+        const isStale = now - lastNotificationsFetchRef.current > NOTIFICATIONS_STALE_MS;
+        if (isStale) {
             fetchNotifications();
         }
-    }, [pathname]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isNotificationsOpen]);
 
     if (pathname.includes("/auth")) return null;
 

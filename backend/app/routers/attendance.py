@@ -122,10 +122,30 @@ async def mark_attendance(
 @router.get("/history", response_model=List[DailyAttendanceResponse])
 async def get_attendance_history(
     current_user: UserResponse = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(database.get_database)
+    db: AsyncIOMotorDatabase = Depends(database.get_database),
+    # Query params are optional to keep backwards compatibility with existing clients.
+    from_: str | None = Query(None, alias="from"),
+    to_: str | None = Query(None, alias="to"),
+    limit: int = Query(1000, ge=1, le=2000),
+    skip: int = Query(0, ge=0),
 ):
-    # Fetch all records for the user. In prod, you'd want pagination or date filters.
-    records = await db["attendance_records"].find({"user_id": current_user.id}).to_list(1000)
+    query = {"user_id": current_user.id}
+
+    # `date` is stored as an ISO string `YYYY-MM-DD` so lexicographic comparisons work.
+    if from_:
+        query["date"] = {"$gte": from_}
+    if to_:
+        query.setdefault("date", {})
+        query["date"]["$lt"] = to_
+
+    cursor = (
+        db["attendance_records"]
+        .find(query)
+        .sort("date", 1)
+        .skip(skip)
+        .limit(limit)
+    )
+    records = await cursor.to_list(length=limit)
     return [fix_id(r) for r in records]
 
 @router.get("/stats", response_model=List[AttendanceStats])
