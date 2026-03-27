@@ -1,11 +1,10 @@
 import axios from "axios";
 
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Axios instance with correct base URL
+// ✅ FIX: added trailing slash
 const api = axios.create({
-    baseURL: `${API_URL}/api/v1`,
+    baseURL: `${API_URL}/api/v1/`,
 });
 
 // Attach token automatically
@@ -24,23 +23,21 @@ api.interceptors.request.use((config) => {
 
 // ---------------- AUTH ----------------
 
-// Register
+// ✅ add trailing slash in endpoints
 export const registerUser = async (data: any) => {
-    const res = await api.post("/auth/register", data);
+    const res = await api.post("auth/register/", data);
     return res.data;
 };
 
-// Login
 export const loginUser = async (data: any) => {
-    const res = await api.post("/auth/login", data);
+    const res = await api.post("auth/login/", data);
     return res.data;
 };
 
 // ---------------- PLANNER ----------------
 
-// Vacation Plan
 export const getVacationPlan = async (data: any) => {
-    const res = await api.post("/planner/recommend", data);
+    const res = await api.post("planner/recommend/", data);
     return res.data;
 };
 

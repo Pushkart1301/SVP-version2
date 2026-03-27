@@ -12,7 +12,7 @@ export default function SubjectsPage() {
 
     const fetchSubjects = async () => {
         try {
-            const res = await api.get("/subjects");
+            const res = await api.get("subjects/");
             setSubjects(res.data);
         } catch (err) {
             console.error(err);
