@@ -33,6 +33,7 @@ app = FastAPI(
 # CORS
 origins = [
     "http://localhost:3000",
+    "https://svp-version2.vercel.app",
     "https://svp-2-0.vercel.app",
     "https://svp-2-0.onrender.com"
 ]
