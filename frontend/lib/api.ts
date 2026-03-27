@@ -21,21 +21,20 @@ api.interceptors.request.use((config) => {
 
 // ---------------- AUTH ----------------
 
-// ✅ add trailing slash in endpoints
 export const registerUser = async (data: any) => {
-    const res = await api.post("auth/register/", data);
+    const res = await api.post("auth/register", data);
     return res.data;
 };
 
 export const loginUser = async (data: any) => {
-    const res = await api.post("auth/login/", data);
+    const res = await api.post("auth/login", data);
     return res.data;
 };
 
 // ---------------- PLANNER ----------------
 
 export const getVacationPlan = async (data: any) => {
-    const res = await api.post("planner/recommend/", data);
+    const res = await api.post("planner/recommend", data);
     return res.data;
 };
 

@@ -27,7 +27,11 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.PROJECT_NAME,
     lifespan=lifespan,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    # Prevent `307/308` redirects when the client sends/omits trailing slashes.
+    # This is critical behind proxies (Vercel/Railway) because redirects may
+    # drop auth headers.
+    redirect_slashes=False,
 )
 
 # CORS

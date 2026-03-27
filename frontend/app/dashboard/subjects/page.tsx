@@ -12,7 +12,7 @@ export default function SubjectsPage() {
 
     const fetchSubjects = async () => {
         try {
-            const res = await api.get("subjects/");
+            const res = await api.get("subjects");
             setSubjects(res.data);
         } catch (err) {
             console.error(err);
@@ -27,7 +27,7 @@ export default function SubjectsPage() {
         e.preventDefault();
         setLoading(true);
         try {
-            await api.post("/subjects", newSubject);
+            await api.post("subjects", newSubject);
             setNewSubject({ name: "", code: "", target_attendance_percent: 75 });
             fetchSubjects();
         } catch (err) {
@@ -39,7 +39,7 @@ export default function SubjectsPage() {
 
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure? This will delete all attendance records for this subject.")) return;
-        await api.delete(`/subjects/${id}`);
+        await api.delete(`subjects/${id}`);
         fetchSubjects();
     };
 

@@ -65,7 +65,7 @@ const Dashboard = () => {
                 const res = await api.get(url);
                 setChartStats(res.data);
             } else {
-                const res = await api.get("/attendance/history");
+                const res = await api.get("attendance/history");
                 const history = res.data;
 
                 const monthlyData: Record<string, { p: number; total: number }> = {};
@@ -117,8 +117,8 @@ const Dashboard = () => {
     const fetchData = async () => {
         try {
             const [userRes, statsRes, monthlyStatsRes] = await Promise.all([
-                api.get("/auth/me"),
-                api.get("/attendance/stats/overall"),
+                api.get("auth/me"),
+                api.get("attendance/stats/overall"),
                 api.get(`/attendance/stats/overall?mode=latest_month`),
             ]);
             setUser(userRes.data);

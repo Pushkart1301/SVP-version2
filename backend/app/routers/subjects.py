@@ -9,7 +9,7 @@ from bson import ObjectId
 
 router = APIRouter()
 
-@router.get("/", response_model=List[SubjectResponse])
+@router.get("", response_model=List[SubjectResponse])
 async def get_subjects(
     current_user: UserResponse = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(database.get_database)
@@ -20,7 +20,7 @@ async def get_subjects(
         sub["_id"] = str(sub["_id"])
     return subjects
 
-@router.post("/", response_model=SubjectResponse)
+@router.post("", response_model=SubjectResponse)
 async def create_subject(
     subject: SubjectCreate,
     current_user: UserResponse = Depends(get_current_user),

@@ -27,7 +27,7 @@ export default function PlannerPage() {
         const formData = new FormData();
         formData.append("file", e.target.files[0]);
         try {
-            const res = await api.post("/planner/academic-calendar/upload", formData);
+            const res = await api.post("planner/academic-calendar/upload", formData);
             setResult(res.data);
         } catch (err) {
             alert("Upload failed");
@@ -41,7 +41,7 @@ export default function PlannerPage() {
         setResult(null);
 
         try {
-            const res = await api.post("/planner/vacation/generate", {
+            const res = await api.post("planner/vacation/generate", {
                 min_attendance: 75,
                 query,
             });
@@ -58,7 +58,7 @@ export default function PlannerPage() {
         setLoading(true);
         setResult(null);
         try {
-            const res = await api.post("/planner/study-plan/generate", {
+            const res = await api.post("planner/study-plan/generate", {
                 focus: "weak_areas",
                 daily_hours: 4,
             });

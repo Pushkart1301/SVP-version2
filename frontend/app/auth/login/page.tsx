@@ -30,7 +30,7 @@ export default function AuthPage() {
             formData.append('username', loginEmail);
             formData.append('password', loginPassword);
 
-            const res = await api.post("/auth/login", formData, {
+            const res = await api.post("auth/login", formData, {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
             });
 
@@ -66,7 +66,7 @@ export default function AuthPage() {
         setIsLoading(true);
 
         try {
-            await api.post("/auth/register", {
+            await api.post("auth/register", {
                 email: regEmail,
                 password: regPassword,
                 full_name: regUsername

@@ -65,7 +65,7 @@ export default function EditProfileModal({ user, onClose, onUpdate }: EditProfil
             };
             if (formData.password) payload.password = formData.password;
 
-            await api.put("/auth/me", payload);
+            await api.put("auth/me", payload);
             onUpdate();
             onClose();
         } catch (err) {

@@ -53,8 +53,8 @@ export default function SchedulePage() {
     const fetchData = async () => {
         try {
             const [subRes, schedRes] = await Promise.all([
-                api.get("/subjects"),
-                api.get("/attendance/schedule"),
+                api.get("subjects"),
+                api.get("attendance/schedule"),
             ]);
 
             setSubjects(subRes.data);
@@ -176,7 +176,7 @@ export default function SchedulePage() {
                     }
                 });
 
-                return api.post("/attendance/schedule", {
+                return api.post("attendance/schedule", {
                     weekday: dayIndex,
                     slots,
                 });

@@ -24,7 +24,7 @@ export default function Navbar() {
         try {
             // api lib handles token injection
             const { default: api } = await import("@/lib/api");
-            const res = await api.get("/auth/me");
+            const res = await api.get("auth/me");
             setUser(res.data);
         } catch (error) {
             console.error("Failed to fetch user in navbar", error);
@@ -34,7 +34,7 @@ export default function Navbar() {
     const fetchNotifications = async () => {
         try {
             const { default: api } = await import("@/lib/api");
-            const res = await api.get("/notifications");
+            const res = await api.get("notifications");
             if (res.data) {
                 setNotifications(res.data);
             }
@@ -56,7 +56,7 @@ export default function Navbar() {
     const markAllAsRead = async () => {
         try {
             const { default: api } = await import("@/lib/api");
-            await api.put("/notifications/read-all");
+            await api.put("notifications/read-all");
             setNotifications(notifications.map(n => ({ ...n, is_read: true })));
         } catch (error) {
             console.error("Failed to mark all as read", error);

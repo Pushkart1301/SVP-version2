@@ -85,7 +85,7 @@ async def get_schedule(
     return [fix_id(s) for s in schedules]
 
 # --- Attendance ---
-@router.post("/", response_model=DailyAttendanceResponse)
+@router.post("", response_model=DailyAttendanceResponse)
 async def mark_attendance(
     attendance: DailyAttendance,
     current_user: UserResponse = Depends(get_current_user),

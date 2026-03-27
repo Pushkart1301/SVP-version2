@@ -51,7 +51,7 @@ export default function CalendarPage() {
         const fetchRefData = async () => {
             // Fetch Subjects
             try {
-                const subRes = await api.get("/subjects");
+                const subRes = await api.get("subjects");
                 setSubjects(subRes.data);
             } catch (error) {
                 console.error("Failed to fetch subjects", error);
@@ -59,7 +59,7 @@ export default function CalendarPage() {
 
             // Fetch Schedule
             try {
-                const schedRes = await api.get("/attendance/schedule");
+                const schedRes = await api.get("attendance/schedule");
                 setSchedule(schedRes.data);
             } catch (error) {
                 console.error("Failed to fetch schedule", error);
@@ -67,7 +67,7 @@ export default function CalendarPage() {
 
             // Fetch Attendance History
             try {
-                const attRes = await api.get("/attendance/history");
+                const attRes = await api.get("attendance/history");
                 console.log("Fetched Attendance:", attRes.data);
 
                 const map: Record<string, any> = {};
@@ -148,7 +148,7 @@ export default function CalendarPage() {
 
         // Save to backend
         try {
-            await api.post("/attendance", {
+            await api.post("attendance", {
                 date: dateKey,
                 entries: newEntries
             });
@@ -264,7 +264,7 @@ export default function CalendarPage() {
 
         setLoading(true);
         try {
-            await api.delete("/attendance/clear");
+            await api.delete("attendance/clear");
             setAttendanceMap({});
             alert("All attendance records cleared successfully!");
         } catch (error) {
